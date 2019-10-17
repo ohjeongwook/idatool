@@ -11,7 +11,7 @@ import base64
 import copy
 
 import idatool.disassembly
-import windbgtool.command
+
 logging.basicConfig(level = logging.DEBUG)
 logger = logging.getLogger(__name__)
 

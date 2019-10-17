@@ -6,7 +6,6 @@ import pprint
 import logging
 import json
 
-import windbgtool.command
 import idatool.breakpoints
 
 logging.basicConfig(level = logging.DEBUG)

@@ -38,17 +38,15 @@ class Util:
                         print '%.8x %.8x %s' % (addr, dword, symbol)
             
 if __name__ == '__main__':
-    import IDA.UI
-
-    filename = r'D:\Analysis\Incidents\CCleaner\Samples\Shellcode\02\proc.dmp'
-    
+    import idatool.ui
+   
     if not os.path.isfile(filename):
         title = 'ResolveSymbol'
         try:
             form.OnClose(form)
-            form = IDA.ui.Form(title)
+            form = idatool.ui.Form(title)
         except:
-            form = IDA.ui.Form(title)
+            form = idatool.ui.Form(title)
 
         form.Show()
 

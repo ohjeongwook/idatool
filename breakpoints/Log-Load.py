@@ -5,7 +5,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 import json
 import pprint
 import logging
-import windbgtool.command
+
 import windbgtool.log
 
 logging.basicConfig(level = logging.DEBUG)

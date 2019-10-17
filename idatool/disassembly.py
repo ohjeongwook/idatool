@@ -259,7 +259,7 @@ class Disasm:
         return operand_str
 
     def GetFilter(self, type):
-        if type == "CallToDS":
+        if type == "CallToSection":
             filter = {'Op': ['call'], 'Target': 'Section'}
         elif type == "IndirectCall":
             filter = {'Op': ['call', 'jmp'], 'Target': 'Indirect'}
@@ -453,6 +453,10 @@ class Disasm:
                         instructions.append(instruction)
                 current += get_item_size(current)
         return instructions
+
+    def GetInstructionsByType(self, range_str = '', type = ""):
+        for instruction in self.GetInstructions(filter = self.GetFilter(type)):
+            print('%.8x\t%s' % (instruction['Address'], instruction['Disasm']))
 
     def FindREPatterns(self, pattern, search_all = False, ea = None):
         matches = []
