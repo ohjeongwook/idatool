@@ -61,7 +61,7 @@ class Util:
             self.idatool.breakpoints.append(function)
 
     def AddCurrentInstruction(self):
-        ea = self.IDADisasm.GetSelectionStart()
+        ea = idatool.util.Area.GetSelectionStart()
         instruction = self.IDADisasm.GetInstruction(ea)        
         pprint.pprint(instruction)
         self.idatool.breakpoints.append(instruction)

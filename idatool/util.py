@@ -18,14 +18,11 @@ import idc
 
 from optparse import OptionParser, Option
 
-class Util:
-    def GetSelectionStart(self):
-        (ea, end) = self.GetSelection()
-        return ea
-
-    def GetFunctionAddress(self, ea = None):
+class Function:
+    @staticmethod
+    def GetAddress(self, ea = None):
         if ea == None:
-            ea = self.GetSelectionStart()
+            ea = Area.GetSelectionStart()
 
         func = get_func(ea)
 
@@ -34,11 +31,8 @@ class Util:
         else:
             return -1
 
-    """Names"""
-    def GetName(self, current_address):
-        return get_true_name(current_address)
-
-    def GetFuncName(self, ea, demangle = True):
+    @staticmethod
+    def GetName(self, ea, demangle = True):
         name = get_func_name(ea)
         demangled_name = idc.Demangle(name, idc.GetLongPrm(idc.INF_SHORT_DN))
         
@@ -47,6 +41,22 @@ class Util:
         else:
             return demangled_name
 
+class Area:
+    @staticmethod
+    def GetSelectionStart(self):
+        (ea, end) = self.GetSelection()
+        return ea
+
+class Name:
+    @staticmethod
+    def GetName(self, current_address):
+        return get_true_name(current_address)
+
+    @staticmethod
+    def SetName(self, ea, name):
+        set_name(ea, str(name))
+
+    @staticmethod
     def IsReservedName(self, name):
         if name.startswith("sub_") or \
             name.startswith("loc_") or \
@@ -62,27 +72,30 @@ class Util:
             return True
         return False
 
-    def SetCmt(self, ea, cmt, flag = 0):
-        set_cmt(ea, str(cmt), flag)
-    
-    def SetName(self, ea, name):
-        set_name(ea, str(name))
-
+    @staticmethod
     def GetSegName(self, addr):
         for i in range(0, get_segm_qty(), 1):
             seg = getnseg(i)
             seg_name = get_segm_name(seg.startEA)
             if seg.startEA <= addr and addr <= seg.endEA:
                 return seg_name
-        return ''
+        return ''        
 
-    """REFs"""
+class Cmt:
+    @staticmethod
+    def Set(self, ea, cmt, flag = 0):
+        set_cmt(ea, str(cmt), flag)
+
+class Refs:
+    @staticmethod
     def GetItemSize(self, ea):
         return get_item_size(ea)
 
+    @staticmethod
     def GetNextItem(self, ea):
         return ea+get_item_size(ea)
 
+    @staticmethod
     def GetCREFFrom(self, ea):
         refs = []
         ref = get_first_cref_from(ea)
@@ -99,6 +112,7 @@ class Util:
             ref = get_next_cref_from(ea, ref)
         return refs
         
+    @staticmethod
     def GetJMPCREFFrom(self, ea):
         jmp_crefs = 0
         for (cref_type, cref) in self.GetCREFFrom(ea):
@@ -106,6 +120,7 @@ class Util:
                 jmp_crefs.append(cref)
         return jmp_crefs
 
+    @staticmethod
     def GetCREFTo(self, ea):
         refs = []
         ref = get_first_cref_to(ea)
@@ -122,6 +137,7 @@ class Util:
 
         return refs
 
+    @staticmethod
     def GetJMPCREFTo(self, ea):
         jmp_crefs = 0
         for (cref_type, cref) in self.GetCREFTo(ea):
@@ -129,6 +145,7 @@ class Util:
                 jmp_crefs.append(cref)
         return jmp_crefs
 
+    @staticmethod
     def GetDREFFrom(self, ea):
         refs = []
         ref = get_first_dref_from(ea)
@@ -138,6 +155,7 @@ class Util:
             
         return refs
 
+    @staticmethod
     def GetDREFTo(self, ea):
         refs = []
         ref = get_first_dref_to(ea)

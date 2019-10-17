@@ -25,9 +25,9 @@ class Block:
     DebugLevel = 0
     def __init__(self, addr = None):
         self.logger = logging.getLogger(__name__)
-        self.IDAUtil = idatool.util.Util()
+
         if addr == None:
-            self.Address = self.IDAUtil.GetSelectionStart()
+            self.Address = idatool.util.Area.GetSelectionStart()
         else:
             self.Address = addr
         self.Blocks = []
@@ -55,10 +55,10 @@ class Block:
         while 1:
             ea_size = get_item_size(ea)
             instructions.append((ea, GetManyBytes(ea, ea_size)))
-            if self.IDAUtil.GetJMPCREFTo(ea) != 1:
+            if idatool.Util.Refs.GetJMPCREFTo(ea) != 1:
                 break
 
-            if len(self.IDAUtil.GetJMPCREFFrom(prev_list[0])) != 1:
+            if len(idatool.Util.Refs.GetJMPCREFFrom(prev_list[0])) != 1:
                 break
 
             prev_ea = prev_list[0]
@@ -75,7 +75,7 @@ class Block:
         prev_bbs = []
         
         self.logger.debug(prefix+'FindPrevBBs: %x', bb)
-        for (cref_type, cref) in self.IDAUtil.GetCREFTo(bb):
+        for (cref_type, cref) in idatool.Util.Refs.GetCREFTo(bb):
             if cref_type != 'Call':
                 prev_bbs.append(self._GetBlockStart(prev_ea, prefix+'\t'))
             
@@ -168,4 +168,4 @@ class Block:
 
     def GetFuncName(self, demangle = True):    
         for root in self.GetRootBlocks():
-            return self.IDAUtil.GetFuncName(root, demangle = demangle)
+            return idatool.Util.Function.GetName(root, demangle = demangle)

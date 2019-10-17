@@ -19,7 +19,7 @@ import idc
 
 from optparse import OptionParser, Option
 
-import idatool.operandtype
+import idatool.operandtypes
 import idatool.block
 import idatool.util
 
@@ -28,7 +28,6 @@ class Disasm:
     
     def __init__(self, parse_args = True):
         self.logger = logging.getLogger(__name__)
-        self.IDAUtil = idatool.util.Util()
 
         self.ImageName = get_root_filename()
         self.ImageBase = get_imagebase()
@@ -189,9 +188,9 @@ class Disasm:
                 self.PrintOperandStructure(op)
         
             operand_repr = {}
-            operand_repr['DataType'] = idatool.operandtype.DTypeStr[operand.dtyp]
+            operand_repr['DataType'] = idatool.operandtypes.DTypeStr[operand.dtyp]
             if OperandTypes.Values.has_key(operand.type):
-                operand_repr['Type'] = idatool.operandtype.Values[operand.type]
+                operand_repr['Type'] = idatool.operandtypes.Values[operand.type]
             else:
                 operand_repr['Type'] = '%x' % operand.type
 
@@ -362,7 +361,7 @@ class Disasm:
 
             if is_reg_call:
                 if self.Debug>2:
-                    self.logger.debug('%x %s %s (%s)', current, op, operand_str, idatool.operandtype.Values[operand.type])
+                    self.logger.debug('%x %s %s (%s)', current, op, operand_str, idatool.operandtypes.Values[operand.type])
                 instruction['IsIndirectRegCall'] = True
 
         use_flags = [CF_USE1, CF_USE2, CF_USE3, CF_USE4, CF_USE5, CF_USE6]
@@ -497,7 +496,7 @@ class Disasm:
                     current += get_item_size(current)
         else:
             if ea == None:
-                ea = self.GetFunctionAddress()
+                ea = idatool.util.Function.GetAddress()
 
             func = get_func(ea)
 
@@ -596,7 +595,7 @@ class Disasm:
 
     def _GetFunctionInstructions(self, ea = None, filter = None, type = 'Instruction'):
         if ea == None:
-            ea = self.IDAUtil.GetSelectionStart()
+            ea = idatool.util.Area.GetSelectionStart()
 
         func = get_func(ea)
         if func:
@@ -777,7 +776,7 @@ class Disasm:
 
     def GetFunctionRefs(self, ea = None):
         if ea == None:
-            ea = self.IDAUtil.GetSelectionStart()
+            ea = idatool.util.Area.GetSelectionStart()
 
         func = get_func(ea)
 
@@ -964,7 +963,7 @@ class Disasm:
                     current_address += get_item_size(current_address)
                     continue
 
-                name = self.GetName(current_address)
+                name = idatool.Util.Name.GetName(current_address)
                 if name != None and name and not self.IsReservedName(name):
                     function_notes.append((current_address-self.ImageBase, '', 0, 'Name', name))
 
@@ -1063,11 +1062,11 @@ class Disasm:
                 notations[current_address] = [type, value]
             else:
                 if type == 'Comment':
-                    self.IDAUtil.SetCmt(current_address, value)
+                    idatool.Util.Cmt.SetCmt(current_address, value)
                 elif type == 'Repeatable Comment':
-                    self.IDAUtil.SetCmt(current_address, value, 1)
+                    idatool.Util.Cmt.SetCmt(current_address, value, 1)
                 elif type == 'Name':
-                    self.IDAUtil.SetName(current_address, value)            
+                    idatool.Util.Name.SetName(current_address, value)            
 
         if len(hash_types) > 0:
             for i in range(0, get_func_qty(), 1):
@@ -1084,11 +1083,11 @@ class Disasm:
                     address = func.startEA
                 
                     if type == 'Comment':
-                        self.IDAUtil.SetCmt(address, value)
+                        idatool.Util.Name.SetCmt(address, value)
                     if type == 'Repeatable Comment':
-                        self.IDAUtil.SetCmt(address, value, 1)
+                        idatool.Util.Cmt.SetCmt(address, value, 1)
                     if type == 'Name':
-                        self.IDAUtil.SetName(address, value)
+                        idatool.Util.Name.SetName(address, value)
         
     def GenHash2Name(self, entries, hash_type_filter):
         hash_2_name = {}
@@ -1211,7 +1210,7 @@ class Disasm:
                                 interesting_call = False
 
                         if interesting_call:
-                            self.logger.debug('%x %s %s (%s)', current, op, operand_str, idatool.operandtype.Values[operand.type])
+                            self.logger.debug('%x %s %s (%s)', current, op, operand_str, idatool.operandtypes.Values[operand.type])
                             instructions.append(self.GetInstruction(current))
 
                 current += get_item_size(current)
@@ -1223,7 +1222,7 @@ class Disasm:
         for seg_ea in Segments():
             for ea in Heads(seg_ea, SegEnd(seg_ea)):
                 if isCode(GetFlags(ea)):
-                    if len(self.IDAUtil.GetCREFTo(ea)) == 0:
+                    if len(idatool.Util.Refs.GetCREFTo(ea)) == 0:
                         func = get_func(ea)
                         if func is None or func.startEA != ea:
                             unrecognized_functions.append(ea)
@@ -1238,7 +1237,7 @@ class Disasm:
         utility_functions = {}
         for function_info in self.GetFunctions():
             ea = function_info['Address']
-            cref_to = self.IDAUtil.GetCREFTo(ea)
+            cref_to = idatool.Util.Refs.GetCREFTo(ea)
 
             if len(cref_to) >= threshold:
                 utility_functions[ea] = True
@@ -1253,7 +1252,7 @@ class Disasm:
         utility_functions = self.FindUtilityFunctions(threshold)        
 
         def GetCallRefs(call_ea, ea, level = 0):
-            func_name = self.IDAUtil.GetFuncName(ea)
+            func_name = idatool.Util.functions.GetName(ea)
             function_list.append((level, func_name, ea, call_ea))
             
             if utility_functions.has_key(ea):
@@ -1275,7 +1274,7 @@ class Disasm:
             for (call_address, call_ref) in call_refs:
                 GetCallRefs(call_address, call_ref, level+1)
                 
-        func_addr = self.GetFunctionAddress(ea)
+        func_addr = idatool.util.Function.GetAddress(ea)
         GetCallRefs(func_addr, func_addr)
         
         return (function_list, function_instructions)
