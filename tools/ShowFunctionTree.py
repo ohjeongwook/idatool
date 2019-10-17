@@ -7,7 +7,6 @@ import idautils
 from idaapi import PluginForm
 from PyQt5 import QtGui, QtCore, QtWidgets
 import pprint
-from TraceLoader import *
 
 import idatool.util
 
@@ -49,7 +48,6 @@ class OperationForm_t(PluginForm):
 			idaapi.jumpto(address)
 			
 	def OnCreate(self, form):
-		self.IDAUtil = idatool.util.Util()
 		self.ImageName = idaapi.get_root_filename()
 		self.ImageBase = idaapi.get_imagebase()
 
@@ -81,7 +79,7 @@ def main():
 	try:
 		OperationForm
 		OperationForm.OnClose(OperationForm)
-		print ("reloading OperationForm")
+		print("reloading OperationForm")
 		OperationForm = OperationForm_t()
 		return	
 	except:
