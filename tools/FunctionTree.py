@@ -8,5 +8,5 @@ import idatool.util
 disasm = idatool.disassembly.Disasm()
 (function_list, function_instructions) = disasm.GetFunctionTree(threshold = 10000)
 for (level, name, address, caller_address) in function_list:
-    cmt = idatool.util.Cmt.GetCmt(caller_address)
-    print '%s%s (%.8x) @ %.8x ; %s' % ('    '*level, name, address, caller_address, cmt)
+    cmt = idatool.util.Cmt.Get(caller_address)
+    print('%s%s ( %.8x ) @ %.8x ; %s' % ('    '*level, name, address, caller_address, cmt))
