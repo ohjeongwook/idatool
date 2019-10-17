@@ -3,10 +3,8 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 import idaapi
-import idautils
 from idaapi import PluginForm
 from PyQt5 import QtGui, QtCore, QtWidgets
-import pprint
 
 import idatool.util
 

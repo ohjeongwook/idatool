@@ -2,16 +2,14 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-import pprint
-import logging
-import json
-
 import idatool.disassembly
 
-logging.basicConfig(level = logging.DEBUG)
-logger = logging.getLogger(__name__)
-
 if __name__ == '__main__':
+    import logging
+
+    logging.basicConfig(level = logging.DEBUG)
+    logger = logging.getLogger(__name__)
+
     disasm = idatool.disassembly.Disasm()
     
     save_filename = ''
@@ -38,6 +36,6 @@ if __name__ == '__main__':
         save_filename = disasm.GetFilename()+r'.lst'
 
     if save_filename:
-        print 'Save', save_filename
+        print('Save', save_filename)
         disasm.Export(save_filename)
     disasm.Exit()

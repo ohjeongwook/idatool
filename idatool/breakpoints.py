@@ -3,16 +3,10 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 import pprint
-import logging
-import json
-import sqlite3
 
 import windbgtool.command
 import windbgtool.breakpoints_storage
 import idatool.ui
-
-logging.basicConfig(level = logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 class Util:
     def __init__(self, ida_disasm = None):
@@ -95,5 +89,10 @@ class Util:
         self.IDADisasm.Exit()
 
 if __name__ == '__main__':
+    import logging
+
+    logging.basicConfig(level = logging.DEBUG)
+    logger = logging.getLogger(__name__)
+
     breakpoints = Util()
     breakpoints.Add("All", "IndirectCall")

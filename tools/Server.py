@@ -4,11 +4,10 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 import functools
 import Queue
-import pprint
-import json
-import logging
+
 import traceback
 import zerorpc
+import threading
 
 from idaapi import *
 from idc import *
@@ -25,9 +24,6 @@ from WinDBG.RunLog import *
 from TraceLoader import *
 
 import idatool.util
-
-logging.basicConfig(level = logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 class IDASyncError(Exception): pass
 
@@ -146,8 +142,6 @@ class IDARPCServer(object):
     def Export(self, lst_filename = ''):
         return self.DisasmTool.Export(lst_filename)
 
-import threading
-
 class ThreadWorker(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -157,5 +151,10 @@ class ThreadWorker(threading.Thread):
         s.bind("tcp://0.0.0.0:4242")
         s.run()
 
-thread_worker = ThreadWorker()
-thread_worker.start()
+if __name__ == '__main__':
+    import logging
+    logging.basicConfig(level = logging.DEBUG)
+    logger = logging.getLogger(__name__)
+
+    thread_worker = ThreadWorker()
+    thread_worker.start()

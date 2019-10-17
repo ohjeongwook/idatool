@@ -2,15 +2,10 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-import pprint
-import json
 from random import randint
-
-from idaapi import *
 import idaapi
 from idc import *
-import idautils
-from PyQt5 import QtGui, QtCore, QtWidgets
+import PyQt5
 
 class Form(idaapi.PluginForm):
     def __init__(self, title):
@@ -18,33 +13,33 @@ class Form(idaapi.PluginForm):
         self.Title = title + ':%x' % randint(0, 0xffffffff)
 
     def AddComboBox(self, items):
-        widget = QtWidgets.QComboBox(self.parent)
+        widget = PyQt5.QtWidgets.QComboBox(self.parent)
         for item in items:
             widget.addItem(item)
         self.Widgets.append(widget)
         
     def AddLineEdit(self, title):
-        self.FileName = QtWidgets.QLineEdit()
-        browser_button = QtWidgets.QPushButton(title)
+        self.FileName = PyQt5.QtWidgets.QLineEdit()
+        browser_button = PyQt5.QtWidgets.QPushButton(title)
         browser_button.clicked.connect(self.Browse)
         
     def CheckBoxPushed(self):
         pass
 
     def AddCheckBox(self, name):
-        widget = QtWidgets.QCheckBox(name, self.parent)
+        widget = PyQt5.QtWidgets.QCheckBox(name, self.parent)
         widget.toggle()
         widget.stateChanged.connect(self.CheckBoxPushed)
         self.Widgets.append(widget)
         
     def AddTree(self, labels):
-        self.Tree = QtWidgets.QTreeWidget()
+        self.Tree = PyQt5.QtWidgets.QTreeWidget()
         self.Tree.setHeaderLabels(labels)
         self.Tree.setColumnWidth(0, 200)
         #self.Tree.itemClicked.connect(self.treeClicked)
         
     def AskSaveFileName(self, filter = "Log (*.log)"):
-        filename, _ = QtWidgets.QFileDialog.getSaveFileName(
+        filename, _ = PyQt5.QtWidgets.QFileDialog.getSaveFileName(
                                                     self.parent, 
                                                     'Open file', 
                                                     '', 
@@ -53,7 +48,7 @@ class Form(idaapi.PluginForm):
         return filename
 
     def AskOpenFileName(self, filter = "Log (*.log)"):
-        filename, _ = QtWidgets.QFileDialog.getOpenFileName(
+        filename, _ = PyQt5.QtWidgets.QFileDialog.getOpenFileName(
                                                     self.parent, 
                                                     'Open file', 
                                                     '', 
@@ -65,12 +60,12 @@ class Form(idaapi.PluginForm):
         self.parent = self.FormToPyQtWidget(form)
         self.Widgets = []
 
-        grid = QtWidgets.QGridLayout()
+        grid = PyQt5.QtWidgets.QGridLayout()
 
         for widget in self.Widgets:
             grid.addWidget(widget, 0, 0)
 
-        main = QtWidgets.QVBoxLayout()
+        main = PyQt5.QtWidgets.QVBoxLayout()
         main.addLayout(grid)
         main.addStretch()        
         self.parent.setLayout(main)

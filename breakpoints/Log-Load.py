@@ -2,16 +2,14 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-import json
-import pprint
-import logging
-
 import windbgtool.log
 
-logging.basicConfig(level = logging.DEBUG)
-logger = logging.getLogger(__name__)
-
 if __name__ == '__main__':
+    import logging
+
+    logging.basicConfig(level = logging.DEBUG)
+    logger = logging.getLogger(__name__)
+
     import Input
     filename = Input.GetResponse()
     

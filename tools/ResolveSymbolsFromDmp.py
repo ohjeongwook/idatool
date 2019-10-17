@@ -2,16 +2,11 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-import pprint
-import logging
 import struct
 
 import idatool.disassembly
 import idatool.util
 import windbgtool.debugger
-
-logging.basicConfig(level = logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 class Util:
     def __init__(self, ida_disasm = None, filename = r''):
@@ -38,7 +33,11 @@ class Util:
                         print '%.8x %.8x %s' % (addr, dword, symbol)
             
 if __name__ == '__main__':
+    import logging
     import idatool.ui
+
+    logging.basicConfig(level = logging.DEBUG)
+    logger = logging.getLogger(__name__)    
    
     if not os.path.isfile(filename):
         title = 'ResolveSymbol'
