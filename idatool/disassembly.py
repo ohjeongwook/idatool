@@ -933,7 +933,7 @@ class Disasm:
             seg = getnseg(i)
             current_address = seg.startEA
             while current_address < seg.endEA:
-                if checked_addresses.has_key(current_address):
+                if current_address in checked_addresses:
                     current_address += get_item_size(current_address)
                     continue
 
@@ -941,11 +941,11 @@ class Disasm:
                 if name != None and name and not idatool.util.Name.IsReservedName(name):
                     function_notes.append((current_address-self.ImageBase, '', 0, 'Name', name))
 
-                comment = idatool.util.Cmt.GetCmt(current_address)
+                comment = idatool.util.Cmt.Get(current_address)
                 if comment != None:
                     function_notes.append((current_address-self.ImageBase, '', 0, 'Comment', comment))
 
-                repeatable_comment = idatool.util.Cmt.GetCmt(current_address, True)
+                repeatable_comment = idatool.util.Cmt.Get(current_address, True)
                 if repeatable_comment != None:
                     function_notes.append((current_address-self.ImageBase, '', 0, 'Repeatable Comment', repeatable_comment))
 
@@ -955,6 +955,7 @@ class Disasm:
 
     def _GetFunctionNotations(self, hash_types):
         checked_addresses = {}
+        function_notes=[] #TODO: This is not used?
         for i in range(0, get_func_qty(), 1):
             func = getn_func(i)
 
