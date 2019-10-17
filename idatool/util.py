@@ -16,11 +16,22 @@ from idautils import *
 from idc import *
 import idc
 
-from optparse import OptionParser, Option
+class Area:
+    @staticmethod
+    def GetSelection():
+        (selection, start, end) = read_selection()
+        start = get_screen_ea()
+        end = start+1
+        return (start, end)
+
+    @staticmethod
+    def GetSelectionStart():
+        (ea, end) = Area.GetSelection()
+        return ea
 
 class Function:
     @staticmethod
-    def GetAddress(self, ea = None):
+    def GetAddress(ea = None):
         if ea == None:
             ea = Area.GetSelectionStart()
 
@@ -32,7 +43,7 @@ class Function:
             return -1
 
     @staticmethod
-    def GetName(self, ea, demangle = True):
+    def GetName(ea, demangle = True):
         name = get_func_name(ea)
         demangled_name = idc.Demangle(name, idc.GetLongPrm(idc.INF_SHORT_DN))
         
@@ -41,23 +52,17 @@ class Function:
         else:
             return demangled_name
 
-class Area:
-    @staticmethod
-    def GetSelectionStart(self):
-        (ea, end) = self.GetSelection()
-        return ea
-
 class Name:
     @staticmethod
-    def GetName(self, current_address):
+    def GetName(current_address):
         return get_true_name(current_address)
 
     @staticmethod
-    def SetName(self, ea, name):
+    def SetName(ea, name):
         set_name(ea, str(name))
 
     @staticmethod
-    def IsReservedName(self, name):
+    def IsReservedName(name):
         if name.startswith("sub_") or \
             name.startswith("loc_") or \
             name.startswith("locret_") or \
@@ -72,8 +77,9 @@ class Name:
             return True
         return False
 
+class Seg:
     @staticmethod
-    def GetSegName(self, addr):
+    def GetName(addr):
         for i in range(0, get_segm_qty(), 1):
             seg = getnseg(i)
             seg_name = get_segm_name(seg.startEA)
@@ -83,20 +89,32 @@ class Name:
 
 class Cmt:
     @staticmethod
-    def Set(self, ea, cmt, flag = 0):
+    def Set(ea, cmt, flag = 0):
         set_cmt(ea, str(cmt), flag)
+
+    @staticmethod        
+    def Get(current_address, get_repeatable_cmt = False):
+        if not has_cmt(current_address):
+            return None
+
+        if get_repeatable_cmt:
+            flag = 1    
+        else:
+            flag = 0
+
+        return get_cmt(current_address, flag)
 
 class Refs:
     @staticmethod
-    def GetItemSize(self, ea):
+    def GetItemSize(ea):
         return get_item_size(ea)
 
     @staticmethod
-    def GetNextItem(self, ea):
+    def GetNextItem(ea):
         return ea+get_item_size(ea)
 
     @staticmethod
-    def GetCREFFrom(self, ea):
+    def GetCREFFrom(ea):
         refs = []
         ref = get_first_cref_from(ea)
         while ref != BADADDR:           
@@ -113,15 +131,15 @@ class Refs:
         return refs
         
     @staticmethod
-    def GetJMPCREFFrom(self, ea):
+    def GetJMPCREFFrom(ea):
         jmp_crefs = 0
-        for (cref_type, cref) in self.GetCREFFrom(ea):
+        for (cref_type, cref) in Refs.GetCREFFrom(ea):
             if cref_type == 'Jmp':
                 jmp_crefs.append(cref)
         return jmp_crefs
 
     @staticmethod
-    def GetCREFTo(self, ea):
+    def GetCREFTo(ea):
         refs = []
         ref = get_first_cref_to(ea)
         while ref != BADADDR:
@@ -138,7 +156,7 @@ class Refs:
         return refs
 
     @staticmethod
-    def GetJMPCREFTo(self, ea):
+    def GetJMPCREFTo(ea):
         jmp_crefs = 0
         for (cref_type, cref) in self.GetCREFTo(ea):
             if cref_type == 'Jmp':
@@ -146,7 +164,7 @@ class Refs:
         return jmp_crefs
 
     @staticmethod
-    def GetDREFFrom(self, ea):
+    def GetDREFFrom(ea):
         refs = []
         ref = get_first_dref_from(ea)
         while ref != BADADDR:
@@ -156,7 +174,7 @@ class Refs:
         return refs
 
     @staticmethod
-    def GetDREFTo(self, ea):
+    def GetDREFTo(ea):
         refs = []
         ref = get_first_dref_to(ea)
         while ref != BADADDR:

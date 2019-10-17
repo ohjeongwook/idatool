@@ -96,7 +96,7 @@ class Hunter:
 
         self.Matches = {}
         for instruction in self.Disasm.GetAllInstructions(filter = {'Op': ['xor', 'add', 'mov', 'sub', 'imul', 'mul'], 'Target': 'Immediate'}):
-            drefs = self.Disasm.GetDREFFrom(instruction['Address'])
+            drefs = idatool.util.Refs.GetDREFFrom(instruction['Address'])
             if len(drefs) == 0:
                 found_interesting_immediate_value = False
                 for operand in instruction['Operands']:

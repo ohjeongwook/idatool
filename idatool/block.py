@@ -55,10 +55,10 @@ class Block:
         while 1:
             ea_size = get_item_size(ea)
             instructions.append((ea, GetManyBytes(ea, ea_size)))
-            if idatool.Util.Refs.GetJMPCREFTo(ea) != 1:
+            if idatool.util.Refs.GetJMPCREFTo(ea) != 1:
                 break
 
-            if len(idatool.Util.Refs.GetJMPCREFFrom(prev_list[0])) != 1:
+            if len(idatool.util.Refs.GetJMPCREFFrom(prev_list[0])) != 1:
                 break
 
             prev_ea = prev_list[0]
@@ -75,7 +75,7 @@ class Block:
         prev_bbs = []
         
         self.logger.debug(prefix+'FindPrevBBs: %x', bb)
-        for (cref_type, cref) in idatool.Util.Refs.GetCREFTo(bb):
+        for (cref_type, cref) in idatool.util.Refs.GetCREFTo(bb):
             if cref_type != 'Call':
                 prev_bbs.append(self._GetBlockStart(prev_ea, prefix+'\t'))
             
@@ -168,4 +168,4 @@ class Block:
 
     def GetFuncName(self, demangle = True):    
         for root in self.GetRootBlocks():
-            return idatool.Util.Function.GetName(root, demangle = demangle)
+            return idatool.util.Function.GetName(root, demangle = demangle)

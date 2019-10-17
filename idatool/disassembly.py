@@ -114,18 +114,6 @@ class Disasm:
                 ea += get_item_size(ea)
         return None
 
-    """ UI """
-    def GetSelection(self):
-        (selection, start, end) = read_selection()
-
-        if selection:
-            self.logger.debug("%d %x - %x", selection, start, end)
-        else:
-            start = get_screen_ea()
-            end = start+1
-
-        return (start, end)
-
     """Utility"""
     def DumpBytes(self, ea, length):
         return GetManyBytes(ea, length)
@@ -189,7 +177,7 @@ class Disasm:
         
             operand_repr = {}
             operand_repr['DataType'] = idatool.operandtypes.DTypeStr[operand.dtyp]
-            if OperandTypes.Values.has_key(operand.type):
+            if idatool.operandtypes.Values.has_key(operand.type):
                 operand_repr['Type'] = idatool.operandtypes.Values[operand.type]
             else:
                 operand_repr['Type'] = '%x' % operand.type
@@ -232,7 +220,7 @@ class Disasm:
 
                 if operand.type == o_mem:
                     operand_repr['Address'] = operand.addr
-                    operand_repr['Segment'] = self.GetSegName(operand.addr)
+                    operand_repr['Segment'] = idatool.util.Seg.GetName(operand.addr)
 
                 elif operand.type == o_displ:            
                     operand_repr['Offset'] = operand.addr
@@ -252,7 +240,8 @@ class Disasm:
 
         elif operand['Type'] == "Immediate" or \
              operand['Type'] == "Memory":
-            operand_str = operand['Value']
+            if 'Value' in operand:
+                operand_str = operand['Value']
 
         elif operand['Type'] == "Displacement":
             index_str = ''
@@ -340,8 +329,8 @@ class Disasm:
         instruction['Disasm'] = self.GetDisasmLine(current)
         op = GetMnem(current)
         instruction['Op'] = op
-        instruction['DREFFrom'] = self.GetDREFFrom(current)
-        instruction['CREFFrom'] = self.GetCREFFrom(current)
+        instruction['DREFFrom'] = idatool.util.Refs.GetDREFFrom(current)
+        instruction['CREFFrom'] = idatool.util.Refs.GetCREFFrom(current)
         
         feature = cmd.get_canon_feature()
         instruction['IsCall'] = (feature & CF_CALL)
@@ -387,7 +376,7 @@ class Disasm:
             instruction['Operands'].append(operand_repr)
         
         name = get_true_name(current)
-        if name != None and name and not self.IsReservedName(name):
+        if name != None and name and not idatool.util.Name.IsReservedName(name):
             instruction['Name'] = name
         else:
             instruction['Name'] = ''
@@ -437,17 +426,6 @@ class Disasm:
                     )
 
         return line
-        
-    def GetCmt(self, current_address, get_repeatable_cmt = False):
-        if not has_cmt(current_address):
-            return None
-
-        if get_repeatable_cmt:
-            flag = 1    
-        else:
-            flag = 0
-
-        return get_cmt(current_address, flag)
 
     def GetInstructionsByRange(self, start = None, end = None, filter = None):
         if start == None or end == None:
@@ -814,7 +792,7 @@ class Disasm:
                     
                     if not (feature & CF_CALL):
                         found_non_next_addr = False
-                        for (cref_type, cref) in self.GetCREFFrom(current):
+                        for (cref_type, cref) in idatool.util.Refs.GetCREFFrom(current):
                             if cref_type == 'Next':
                                 continue
 
@@ -963,15 +941,15 @@ class Disasm:
                     current_address += get_item_size(current_address)
                     continue
 
-                name = idatool.Util.Name.GetName(current_address)
-                if name != None and name and not self.IsReservedName(name):
+                name = idatool.util.Name.GetName(current_address)
+                if name != None and name and not idatool.util.Name.IsReservedName(name):
                     function_notes.append((current_address-self.ImageBase, '', 0, 'Name', name))
 
-                comment = self.GetCmt(current_address)
+                comment = idatool.util.Cmt.GetCmt(current_address)
                 if comment != None:
                     function_notes.append((current_address-self.ImageBase, '', 0, 'Comment', comment))
 
-                repeatable_comment = self.GetCmt(current_address, True)
+                repeatable_comment = idatool.util.Cmt.GetCmt(current_address, True)
                 if repeatable_comment != None:
                     function_notes.append((current_address-self.ImageBase, '', 0, 'Repeatable Comment', repeatable_comment))
 
@@ -1062,11 +1040,11 @@ class Disasm:
                 notations[current_address] = [type, value]
             else:
                 if type == 'Comment':
-                    idatool.Util.Cmt.SetCmt(current_address, value)
+                    idatool.util.Cmt.SetCmt(current_address, value)
                 elif type == 'Repeatable Comment':
-                    idatool.Util.Cmt.SetCmt(current_address, value, 1)
+                    idatool.util.Cmt.SetCmt(current_address, value, 1)
                 elif type == 'Name':
-                    idatool.Util.Name.SetName(current_address, value)            
+                    idatool.util.Name.SetName(current_address, value)            
 
         if len(hash_types) > 0:
             for i in range(0, get_func_qty(), 1):
@@ -1083,11 +1061,11 @@ class Disasm:
                     address = func.startEA
                 
                     if type == 'Comment':
-                        idatool.Util.Name.SetCmt(address, value)
+                        idatool.util.Name.SetCmt(address, value)
                     if type == 'Repeatable Comment':
-                        idatool.Util.Cmt.SetCmt(address, value, 1)
+                        idatool.util.Cmt.SetCmt(address, value, 1)
                     if type == 'Name':
-                        idatool.Util.Name.SetName(address, value)
+                        idatool.util.Name.SetName(address, value)
         
     def GenHash2Name(self, entries, hash_type_filter):
         hash_2_name = {}
@@ -1222,7 +1200,7 @@ class Disasm:
         for seg_ea in Segments():
             for ea in Heads(seg_ea, SegEnd(seg_ea)):
                 if isCode(GetFlags(ea)):
-                    if len(idatool.Util.Refs.GetCREFTo(ea)) == 0:
+                    if len(idatool.util.Refs.GetCREFTo(ea)) == 0:
                         func = get_func(ea)
                         if func is None or func.startEA != ea:
                             unrecognized_functions.append(ea)
@@ -1237,7 +1215,7 @@ class Disasm:
         utility_functions = {}
         for function_info in self.GetFunctions():
             ea = function_info['Address']
-            cref_to = idatool.Util.Refs.GetCREFTo(ea)
+            cref_to = idatool.util.Refs.GetCREFTo(ea)
 
             if len(cref_to) >= threshold:
                 utility_functions[ea] = True
@@ -1252,7 +1230,7 @@ class Disasm:
         utility_functions = self.FindUtilityFunctions(threshold)        
 
         def GetCallRefs(call_ea, ea, level = 0):
-            func_name = idatool.Util.functions.GetName(ea)
+            func_name = idatool.util.Function.GetName(ea)
             function_list.append((level, func_name, ea, call_ea))
             
             if utility_functions.has_key(ea):
