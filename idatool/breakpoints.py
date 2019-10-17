@@ -7,10 +7,9 @@ import logging
 import json
 import sqlite3
 
-import idatool
 import windbgtool.command
 import windbgtool.breakpoints_storage
-import ui
+import idatool.ui
 
 logging.basicConfig(level = logging.DEBUG)
 logger = logging.getLogger(__name__)

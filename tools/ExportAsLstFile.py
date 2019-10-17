@@ -18,7 +18,7 @@ if __name__ == '__main__':
     if len(disasm.Args)>0:
         save_filename = disasm.Args[0]
     else:        
-        import ui
+        import idatool.ui
 
         global form
 
@@ -26,9 +26,9 @@ if __name__ == '__main__':
         try:
             form
             form.OnClose(form)
-            form = ui.Form(title)
+            form = idatool.ui.Form(title)
         except:
-            form = ui.Form(title)
+            form = idatool.ui.Form(title)
 
         form.Show()
 
