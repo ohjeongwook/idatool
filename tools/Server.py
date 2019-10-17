@@ -19,10 +19,12 @@ from idaapi import PluginForm
 import Disasm
 import Disasm.Vex
 import Disasm.Tool
+
 from Util.Config import *
 from WinDBG.RunLog import *
 from TraceLoader import *
-import REPack
+
+import idatool.util
 
 logging.basicConfig(level = logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -121,7 +123,7 @@ class IDARPCServer(object):
     @idawrite    
     def SetCmts(self, cmt_map):
         for kv in cmt_map.items():
-            self.IDADisasm.SetCmt(kv[0], kv[1])
+            idatool.util.Cmt.Set(kv[0], kv[1])
 
     @idaread
     def GetIndirectCalls(self):

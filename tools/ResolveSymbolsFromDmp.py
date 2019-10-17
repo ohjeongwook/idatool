@@ -7,6 +7,7 @@ import logging
 import struct
 
 import idatool.disassembly
+import idatool.util
 import windbgtool.debugger
 
 logging.basicConfig(level = logging.DEBUG)
@@ -31,7 +32,7 @@ class Util:
                     symbol = self.PykdTool.ResolveSymbol(dword)
                     if symbol and symbol.find('+')<0:
                         self.IDADisasm.Redefine(addr, 4, 'data', data_type = 'DWORD')
-                        self.IDADisasm.SetCmt(addr, symbol, 1)
+                        idatool.util.Cmt.Set(addr, symbol, 1)
                         name = symbol.split('!')[1]
                         self.IDADisasm.SetName(addr, name)
                         print '%.8x %.8x %s' % (addr, dword, symbol)

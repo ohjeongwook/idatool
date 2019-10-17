@@ -376,7 +376,7 @@ class Disasm:
             instruction['Operands'].append(operand_repr)
         
         name = get_true_name(current)
-        if name != None and name and not idatool.util.Name.IsReservedName(name):
+        if name != None and name and not idatool.util.Name.IsReserved(name):
             instruction['Name'] = name
         else:
             instruction['Name'] = ''
@@ -938,7 +938,7 @@ class Disasm:
                     continue
 
                 name = idatool.util.Name.GetName(current_address)
-                if name != None and name and not idatool.util.Name.IsReservedName(name):
+                if name != None and name and not idatool.util.Name.IsReserved(name):
                     function_notes.append((current_address-self.ImageBase, '', 0, 'Name', name))
 
                 comment = idatool.util.Cmt.Get(current_address)
@@ -1005,6 +1005,9 @@ class Disasm:
         c.execute(create_table_sql)
 
         for (address, function_hash, sequence, type, value) in self.GetNotations(hash_types = hash_types):
+            if idatool.util.Name.IsReserved(value):
+                continue
+
             try:
                 c.execute('INSERT INTO Notations (RVA, HashType, HashParam, Hash, Sequence, Type, Value) VALUES (?, ?, ?, ?, ?, ?, ?)', 
                     (str(address), 'FunctionHash', '', function_hash, sequence, type, value))
@@ -1037,11 +1040,12 @@ class Disasm:
                 notations[current_address] = [type, value]
             else:
                 if type == 'Comment':
-                    idatool.util.Cmt.SetCmt(current_address, value)
+                    idatool.util.Cmt.Set(current_address, value)
                 elif type == 'Repeatable Comment':
-                    idatool.util.Cmt.SetCmt(current_address, value, 1)
+                    idatool.util.Cmt.Set(current_address, value, 1)
                 elif type == 'Name':
-                    idatool.util.Name.SetName(current_address, value)            
+                    if not idatool.util.Name.IsReserved(value):
+                        idatool.util.Name.SetName(current_address, value)            
 
         if len(hash_types) > 0:
             for i in range(0, get_func_qty(), 1):
@@ -1058,11 +1062,12 @@ class Disasm:
                     address = func.startEA
                 
                     if type == 'Comment':
-                        idatool.util.Name.SetCmt(address, value)
+                        idatool.util.Cmt.Set(address, value)
                     if type == 'Repeatable Comment':
-                        idatool.util.Cmt.SetCmt(address, value, 1)
+                        idatool.util.Cmt.Set(address, value, 1)
                     if type == 'Name':
-                        idatool.util.Name.SetName(address, value)
+                        if not idatool.util.Name.IsReserved(value):
+                            idatool.util.Name.SetName(address, value)
         
     def GenHash2Name(self, entries, hash_type_filter):
         hash_2_name = {}
@@ -1130,7 +1135,7 @@ class Disasm:
 
                     value = names_and_comments[address_str][data_type]
 
-                    if self.IsReservedName(value):
+                    if self.IsReserved(value):
                         continue
 
                     self.logger.debug('\t%x: %s %s (orig address = %x/function = %x (diff = %x))', current_address, data_type, value, address, function_address, address-function_address)

@@ -62,7 +62,7 @@ class Name:
         set_name(ea, str(name))
 
     @staticmethod
-    def IsReservedName(name):
+    def IsReserved(name):
         if name.startswith("sub_") or \
             name.startswith("loc_") or \
             name.startswith("locret_") or \
@@ -73,6 +73,8 @@ class Name:
             name.startswith("dbl_") or \
             name.startswith("stru_") or \
             name.startswith("byte_") or \
+            name.startswith("asc_") or \
+            name.startswith("xmmword_") or \
             name.startswith("off_"):
             return True
         return False
