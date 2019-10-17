@@ -27,7 +27,7 @@ class OperationForm_t(PluginForm):
 
 	def EnumerateTree(self, current_root, parent, level):		
 		address_list = []
-		for ea in idatool.util.Function.DumpFunctionCalls(parent):
+		for ea in idatool.util.Function.DumpFunctionCalls(parent): # TODO: DumpFunctionCalls is missing
 			item = self.AddItem(current_root, ea)
 			address_list.append([ea, item, level+1])
 		return address_list

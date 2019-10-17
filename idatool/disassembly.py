@@ -583,19 +583,16 @@ class Disasm:
         block_starts = {}
         block_ends = {}
 
-        self.logger.debug('* _GetFunctionInstructions: 1')
         block_start_map = {func.startEA:1}
         block_start_list = [func.startEA]
         crefs_map = {}
         for block_start in block_start_list:
             current = block_start
             while 1:
-                self.logger.debug('* _GetFunctionInstructions: %x' % (current))
                 instruction = self.GetInstruction(current)
                 if instruction == None:
                     break
-                    
-                self.logger.debug('* _GetFunctionInstructions: instruction is not non')
+
                 if self.MatchInstructionFilter(filter, instruction):                        
                     if type == 'Instruction':
                         yield instruction
@@ -627,7 +624,6 @@ class Disasm:
                                 block_starts[cref] = 1
                     break
 
-                self.logger.debug('* _GetFunctionInstructions: get_item_size(current) = %x' % (get_item_size(current)))
                 current += get_item_size(current)
 
             if type == 'Block':

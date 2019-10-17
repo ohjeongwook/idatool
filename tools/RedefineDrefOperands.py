@@ -15,12 +15,12 @@ if __name__ == '__main__':
     disasm = idatool.disassembly.Disasm()
 
     for (instruction, imm_operands) in disasm.FindImmediateSegmentsRefs():    
-        print disasm.GetInstructionText(instruction)
+        print(disasm.GetInstructionText(instruction))
         for imm_operand in imm_operands:
-            print '\t%.8x' % imm_operand            
+            print('\t%.8x' % imm_operand)
             drefs = disasm.GetDREFTo(imm_operand)
             for dref in drefs:
-                print '\t\tdref: %.8x' % dref
+                print('\t\tdref: %.8x' % dref)
                 
             if len(drefs) == 0:
                 disasm.Redefine(imm_operand, 1, type = 'Data')
