@@ -24,6 +24,7 @@ from WinDBG.RunLog import *
 from TraceLoader import *
 
 import idatool.util
+import idatool.disassembly
 
 class IDASyncError(Exception): pass
 
@@ -85,36 +86,36 @@ def idaread(f):
 
 class IDARPCServer(object):
     def __init__(self):
-        self.IDADisasm = Analysis.disassembly()
+        self.Disasm = idatool.disassembly.Disasm()
         self.DisasmTool = Disasm.Tool.Analyzer('x86', 64)
 
     @idaread
     def GetFunctionInstructions(self, ea = None):
-        return self.IDADisasm.GetFunctionInstructions(ea)
+        return self.Disasm.GetFunctionInstructions(ea)
         
     @idaread
     def GetFunctions(self):
-        return self.IDADisasm.GetFunctions()
+        return self.Disasm.GetFunctions()
         
     @idaread
     def GetFunctionHashes(self):
-        return self.IDADisasm.GetFunctionHashes(hash_types = ['op'])
+        return self.Disasm.GetFunctionHashes(hash_types = ['op'])
         
     @idaread
     def GetFunctionTree(self, ea = None, threshold = 10):
-        return self.IDADisasm.GetFunctionTree(ea, threshold)
+        return self.Disasm.GetFunctionTree(ea, threshold)
 
     @idaread
     def GetImports(self):
-		return self.IDADisasm.GetImports()
+		return self.Disasm.GetImports()
 
     @idawrite
     def LoadFunctionNameByHashes(self, filename):
-        return self.IDADisasm.LoadFunctionNameByHashes(filename)
+        return self.Disasm.LoadFunctionNameByHashes(filename)
 
     @idawrite
     def LoadNamesAndComments(self, filename):
-        return self.IDADisasm.LoadNamesAndComments(filename)
+        return self.Disasm.LoadNamesAndComments(filename)
         
     @idawrite    
     def SetCmts(self, cmt_map):
@@ -123,7 +124,7 @@ class IDARPCServer(object):
 
     @idaread
     def GetIndirectCalls(self):
-        return self.IDADisasm.GetIndirectCalls()
+        return self.Disasm.GetIndirectCalls()
 
     @idaread
     def DisasmBytes(self, bytes, addr):

@@ -9,29 +9,25 @@ import windbgtool.breakpoints_storage
 import idatool.ui
 
 class Util:
-    def __init__(self, ida_disasm = None):
-        if ida_disasm != None:
-            self.IDADisasm = ida_disasm
-        else:
-            self.IDADisasm = idatool.disassembly()
-
+    def __init__(self):
+        self.Disasm = idatool.disassembly()
         self.Lines = []
         self.Breakpoints = []
 
     def Add(self, range_str = '', type = ""):
-        filter = self.IDADisasm.GetFilter(type)
+        filter = self.Disasm.GetFilter(type)
 
         command_generator = windbgtool.command.Generator(
-                                                self.IDADisasm.ImageBase, 
-                                                self.IDADisasm.ImageBase
+                                                self.Disasm.ImageBase, 
+                                                self.Disasm.ImageBase
                                             )
 
         if range_str == 'FunctionTree':
-            for (func_name, instructions) in self.IDADisasm.GetFunctionTreeInstructions(filter = filter).items():
+            for (func_name, instructions) in self.Disasm.GetFunctionTreeInstructions(filter = filter).items():
                 for line in command_generator.GenerateCommandsForInstructions(instructions, func_name = func_name):
                     print(line)
         else:
-            instructions = self.IDADisasm.GetInstructions(filter = filter)
+            instructions = self.Disasm.GetInstructions(filter = filter)
             self.Breakpoints += instructions
 
     def AddFunctions(self):
@@ -40,7 +36,7 @@ class Util:
                   'LoadLibraryA', 'GetProcAddress', 'lstrcpyW', 'ResolveAPI', '__alloca_probe'
                  ]
 
-        for function in self.IDADisasm.GetFunctions():
+        for function in self.Disasm.GetFunctions():
             name = function['Name']
             bp = True
             for pattern in patterns:
@@ -55,14 +51,14 @@ class Util:
 
     def AddCurrentInstruction(self):
         ea = idatool.util.Area.GetSelectionStart()
-        instruction = self.IDADisasm.GetInstruction(ea)        
+        instruction = self.Disasm.GetInstruction(ea)        
         pprint.pprint(instruction)
         self.idatool.breakpoints.append(instruction)
 
     def Save(self, filename = ''):
         if not filename:
-            if len(self.IDADisasm.Args)>0:
-                filename = self.IDADisasm.Args[0]
+            if len(self.Disasm.Args)>0:
+                filename = self.Disasm.Args[0]
 
             if not filename:
                 form = ui.Form('Breakpoints-UI')
@@ -73,20 +69,20 @@ class Util:
             print('Saving breakpoints to ' + filename)
 
             if filename.endswith('.db'):
-                module_name = self.IDADisasm.GetFileBasename()
+                module_name = self.Disasm.GetFileBasename()
                 stoage = windbgtool.breakpoints_storage.Storage(filename, module_name = module_name)
                 stoage.Save(self.Breakpoints)
 
             elif filename.endswith('.txt'):
                 command_generator = windbgtool.command.Generator(
-                                                self.IDADisasm.ImageBase, 
-                                                self.IDADisasm.ImageBase
+                                                self.Disasm.ImageBase, 
+                                                self.Disasm.ImageBase
                                             )
 
                 command_generator.SaveBreakpoints(filename, self.Breakpoints)
 
     def Exit(self):
-        self.IDADisasm.Exit()
+        self.Disasm.Exit()
 
 if __name__ == '__main__':
     import logging

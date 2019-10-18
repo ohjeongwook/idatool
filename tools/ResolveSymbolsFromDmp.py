@@ -9,27 +9,23 @@ import idatool.util
 import windbgtool.debugger
 
 class Util:
-    def __init__(self, ida_disasm = None, filename = r''):
-        if ida_disasm != None:
-            self.IDADisasm = ida_disasm
-        else:
-            self.IDADisasm = idatool.disassembly.Disasm()
-
-        self.PykdTool = windbgtool.debugger.Debugger(dump_file = filename)
-        self.PykdTool.SetSymbolPath()
+    def __init__(self, filename = r''):
+        self.Disasm = idatool.disassembly.Disasm()
+        self.debugger = windbgtool.debugger.Debugger(dump_file = filename)
+        self.debugger.SetSymbolPath()
 
     def FindAddrBytes(self, type = ""):
-        for addr in self.IDADisasm.Addresses(4):
-            bytes = self.IDADisasm.DumpBytes(addr, 4)
+        for addr in self.Disasm.Addresses(4):
+            bytes = self.Disasm.DumpBytes(addr, 4)
             if bytes != None and len(bytes) == 4:
                 (dword, ) = struct.unpack("<L", bytes)
                 if dword>0:
-                    symbol = self.PykdTool.ResolveSymbol(dword)
+                    symbol = self.debugger.ResolveSymbol(dword)
                     if symbol and symbol.find('+')<0:
-                        self.IDADisasm.Redefine(addr, 4, 'data', data_type = 'DWORD')
+                        self.Disasm.Redefine(addr, 4, 'data', data_type = 'DWORD')
                         idatool.util.Cmt.Set(addr, symbol, 1)
                         name = symbol.split('!')[1]
-                        self.IDADisasm.SetName(addr, name)
+                        self.Disasm.SetName(addr, name)
                         print('%.8x %.8x %s' % (addr, dword, symbol))
             
 if __name__ == '__main__':
