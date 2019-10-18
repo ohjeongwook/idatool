@@ -25,20 +25,13 @@ import idatool.util
 class Disasm:
     Debug = 0
     
-    def __init__(self, parse_args = True):
+    def __init__(self, exit_idc = false):
+        self.ExitIDC = exit_idc
         self.logger = logging.getLogger(__name__)
 
         self.ImageName = get_root_filename()
-        self.ImageBase = get_imagebase()
-        self.Parser = OptionParser(usage = "usage: %prog [options] args")
-        self.Parser.add_option("-x", "--exit", dest = "exit", action = "store_true", default = False)
-        self.Parser.add_option("-d", "--db", dest = "db", action = "store_true", default = False)
-        
-        if parse_args:
-            self.ParseArgs()
-
+        self.ImageBase = get_imagebase()        
         self.WaitAnalysis()
-
 
     def GetNativeSize(self):
         try:
@@ -1354,18 +1347,8 @@ class Disasm:
     def MakeFunction(self, addr, len):
         MakeFunction(addr, addr+len)
 
-    def AddArgsOption(self, *args, **kwargs):
-        self.Parser.add_option(*args, **kwargs)
-
-    def ParseArgs(self):
-        argv = []
-        for i in xrange(1, len(idc.ARGV)):
-            argv.append(idc.ARGV[i])
-
-        (self.Options, self.Args) = self.Parser.parse_args(argv)
-
     def Exit(self):
-        if self.Options.exit:
+        if self.ExitIDC:
             idc.Exit(0)
 
 if __name__ == '__main__':

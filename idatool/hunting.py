@@ -3,7 +3,6 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 import json
-import yara
 import sqlite3
 import base64
 
@@ -11,18 +10,9 @@ import idatool.disassembly
 
 class Hunter:
     Debug = 0
-    def __init__(self, yara_file = '', log_filename = ''):
-        self.Disasm = idatool.disassembly.Disasm(parse_args = False)
-        self.Disasm.AddArgsOption("-y", "--yara_filename", dest = "yara_filename", type = "string", default = '', metavar = "YARA_FILENAME", help = "Yara filename")
-        self.Disasm.AddArgsOption("-D", "--db_filename", dest = "db_filename", type = "string", default = 'Matches.db', metavar = "YARA_FILENAME", help = "Match DB filename")
-        self.Disasm.ParseArgs()
-
-        if self.Disasm.Options.yara_filename:
-            self.YaraRules = yara.compile(self.Disasm.Options.yara_filename)
-        else:
-            self.YaraRules = None
-        self.OpenLog(log_filename)
-        
+    def __init__(self, log_filename = ''):
+        self.Disasm = idatool.disassembly.Disasm()
+        self.OpenLog(log_filename)        
         self.Matches = {}
 
     def OpenLog(self, log_filename):
@@ -44,7 +34,6 @@ class Hunter:
 
     def FindLoops(self):
         for loop in self.Disasm.FindLoops():
-            #print '%.8x: %s' % (loop['Function']['Address'], loop['Function']['Name'])
             for loop in loop['Loops']:
                 print '\t', self.Disasm.DumpPaths(loop)
                 block_instructions = []
@@ -63,15 +52,8 @@ class Hunter:
             block_bytes += bytes
             if block_instruction['Op'] == 'call':
                 call_instruction_cnt += 1
-
-        yara_match_str = ''
-        if self.YaraRules != None:
-            yara_matches = self.YaraRules.match(data = block_bytes)
             
-            for yara_match in yara_matches:
-                yara_match_str += str(yara_match)+' '
-            
-        if call_instruction_cnt>max_call_instruction_cnt and yara_match_str == '':
+        if call_instruction_cnt>max_call_instruction_cnt:
             return
 
         block_hash = self.Disasm.GetInstructionsHash(block_instructions)
@@ -109,6 +91,7 @@ class Hunter:
             conn = sqlite3.connect(db_filename)
         except:
             return
+
         conn.text_factory = str
 
         c = conn.cursor()
