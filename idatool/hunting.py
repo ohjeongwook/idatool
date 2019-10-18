@@ -25,7 +25,7 @@ class Hunter:
         if self.fd != None:
             self.fd.write(line+'\n')
         else:
-            print line
+            print(line)
 
     def Close(self):
         if self.fd != None:
@@ -35,11 +35,11 @@ class Hunter:
     def FindLoops(self):
         for loop in self.Disasm.FindLoops():
             for loop in loop['Loops']:
-                print '\t', self.Disasm.DumpPaths(loop)
+                print('\t' + self.Disasm.DumpPaths(loop))
                 block_instructions = []
                 for block_start in loop:
                     for instruction in self.Disasm.GetBlockInstructions(block_start):
-                        print '\t\t', self.Disasm.GetInstructionText(instruction)
+                        print('\t\t' + self.Disasm.GetInstructionText(instruction))
                         block_instructions.append(instruction)
                 self.AddInstructions(block_instructions)
         

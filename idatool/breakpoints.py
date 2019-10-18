@@ -29,7 +29,7 @@ class Util:
         if range_str == 'FunctionTree':
             for (func_name, instructions) in self.IDADisasm.GetFunctionTreeInstructions(filter = filter).items():
                 for line in command_generator.GenerateCommandsForInstructions(instructions, func_name = func_name):
-                    print line
+                    print(line)
         else:
             instructions = self.IDADisasm.GetInstructions(filter = filter)
             self.Breakpoints += instructions
@@ -70,7 +70,7 @@ class Util:
                 filename = form.AskSaveFileName("DB (*.db);;Command (*.txt)")
 
         if filename:
-            print 'Saving breakpoints to', filename
+            print('Saving breakpoints to ' + filename)
 
             if filename.endswith('.db'):
                 module_name = self.IDADisasm.GetFileBasename()

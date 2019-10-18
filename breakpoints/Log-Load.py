@@ -37,6 +37,6 @@ if __name__ == '__main__':
                             'Comment': comment
                         }
 
-    print '* Loading names and comments:'
+    print('* Loading names and comments:')
     pprint.pprint(name_and_comments)
     disasm.SaveNameAndComments(name_and_comments)

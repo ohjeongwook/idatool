@@ -100,7 +100,7 @@ class Parser:
         for entry in self.Entries:
             if entry.has_key('Name') and entry['Name'] == name:                
                 for parsed_line in entry['Lines']:
-                    print parsed_line
+                    print(parsed_line)
                     if parsed_line == None:
                         continue
                     bytes += parsed_line['Bytes']
@@ -118,5 +118,3 @@ if __name__ == '__main__':
     
     parser = Parser(filename)
     parser.Parse()
-    #for name in parser.GetNames():
-    #    print Util.Common.DumpHex(parser.GetBytes(name))

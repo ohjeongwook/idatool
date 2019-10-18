@@ -30,7 +30,7 @@ class Util:
                         idatool.util.Cmt.Set(addr, symbol, 1)
                         name = symbol.split('!')[1]
                         self.IDADisasm.SetName(addr, name)
-                        print '%.8x %.8x %s' % (addr, dword, symbol)
+                        print('%.8x %.8x %s' % (addr, dword, symbol))
             
 if __name__ == '__main__':
     import logging

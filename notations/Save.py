@@ -36,6 +36,6 @@ if __name__ == '__main__':
         save_filename = r'InstructioNotations.db'
 
     if save_filename:
-        print 'Saving file:', save_filename
+        print('Saving file: ' + save_filename)
         disasm.SaveNotations(save_filename, hash_types = [])
     disasm.Exit()

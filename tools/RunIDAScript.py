@@ -31,7 +31,7 @@ class Runner:
                     cmds.append(self.IDAQ)
                     cmds.append(r'-S%s' % (self.ArgStr))
                     cmds.append(full_path)
-                    print '> Running', cmds
+                    print('> Running ' + str(cmds))
                     p = subprocess.Popen(cmds)
                     p.wait()
 

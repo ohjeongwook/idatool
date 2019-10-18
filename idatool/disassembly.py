@@ -120,7 +120,6 @@ class Disasm:
         return GetInputFileMD5()
 
     """ Instruction level function """
-
     def GetRegName(self, reg, dtyp = None):
         if dtyp == None:
             return get_reg_name(reg, self.GetNativeSize()/8)
@@ -131,34 +130,34 @@ class Disasm:
         return tag_remove(generate_disasm_line(ea, 0))
 
     def PrintOperandStructure(self, op):
-        print "op.n: %x" % (op.n)
-        print "op.type: %x" % (op.type)
-        print "op.offb: %x" % (op.offb)
-        print "op.flags: %x" % (op.flags)
-        print "op.dtyp: %x" % (op.dtyp)
-        print "op.reg: %s (%x)" % (self.GetRegName(op.reg), op.reg)
-        print "op.phrase: %s (%x)" % (self.GetRegName(op.phrase), op.phrase)
-        #print "op.value: %s (%x)" % (self.GetRegName(op.value), op.value)
-        print "op.addr: %x" % (op.addr)
-        print "op.specval: %x" % (op.specval)
-        print "op.specflag1: %x" % (op.specflag1)
-        print "op.specflag2: %x" % (op.specflag2)
+        print("op.n: %x" % (op.n))
+        print("op.type: %x" % (op.type))
+        print("op.offb: %x" % (op.offb))
+        print("op.flags: %x" % (op.flags))
+        print("op.dtyp: %x" % (op.dtyp))
+        print("op.reg: %s (%x)" % (self.GetRegName(op.reg), op.reg))
+        print("op.phrase: %s (%x)" % (self.GetRegName(op.phrase), op.phrase))
+        #print("op.value: %s (%x)" % (self.GetRegName(op.value), op.value))
+        print("op.addr: %x" % (op.addr))
+        print("op.specval: %x" % (op.specval))
+        print("op.specflag1: %x" % (op.specflag1))
+        print("op.specflag2: %x" % (op.specflag2))
         
         base  = op.specflag2 & 0x7
         index = (op.specflag2 & 0x38) >> 3
         scale = (op.specflag2 & 0xc0) >> 6
         
         if base != 5:
-            print "\tbase: %s (%x)" % (self.GetRegName(base), base)
+            print("\tbase: %s (%x)" % (self.GetRegName(base), base))
             
         if index != 4:
-            print "\tindex: %s (%x)" % (self.GetRegName(index), index)
+            print("\tindex: %s (%x)" % (self.GetRegName(index), index))
 
-        print "\tscale: %x" % scale
+        print("\tscale: %x" % scale)
         
-        print "op.specflag3: %x" % (op.specflag3)
-        print "op.specflag4: %x" % (op.specflag4)
-        print ''
+        print("op.specflag3: %x" % (op.specflag3))
+        print("op.specflag4: %x" % (op.specflag4))
+        print('')
 
     def GetOperand(self, operand):
         operand_repr = None
@@ -872,7 +871,7 @@ class Disasm:
             return
 
         if self.Debug>0:
-            print self.DumpPaths(paths + [src])
+            print(self.DumpPaths(paths + [src]))
         
         if src_map.has_key(src):
             visited_nodes = copy.deepcopy(visited_nodes)
@@ -889,13 +888,13 @@ class Disasm:
         for src in src_map.keys():
             if not dst_map.has_key(src):
                 if self.Debug>0:
-                    print 'Root: %.8x' % src
+                    print('Root: %.8x' % src)
                 roots.append(src)
 
         if self.Debug>0:
             for (src, dst_list) in src_map.items():
                 for dst in dst_list:
-                    print 'Dump: %.8x -> %.8x' % (src, dst)
+                    print('Dump: %.8x -> %.8x' % (src, dst))
 
         loops = []
         for root in roots:
@@ -1000,19 +999,19 @@ class Disasm:
 
         c.execute(create_table_sql)
 
-        for (address, function_hash, sequence, type, value) in self.GetNotations(hash_types = hash_types):
+        for (address, function_hash, sequence, notation_type, value) in self.GetNotations(hash_types = hash_types):
             if idatool.util.Name.IsReserved(value):
                 continue
 
             try:
                 c.execute('INSERT INTO Notations (RVA, HashType, HashParam, Hash, Sequence, Type, Value) VALUES (?, ?, ?, ?, ?, ?, ?)', 
-                    (str(address), 'FunctionHash', '', function_hash, sequence, type, value))
+                    (str(address), 'FunctionHash', '', function_hash, sequence, notation_type, value))
             except:
-                print 'address:', address
-                print 'function_hash:', function_hash
-                print 'sequence:', sequence
-                print 'type:', type
-                print 'value:', value
+                print('address:' + str(address))
+                print('function_hash:' + function_hash)
+                print('sequence:' + str(sequence))
+                print('type:' + notation_type)
+                print('value:' + value)
 
         conn.commit()
         conn.close()
@@ -1280,7 +1279,7 @@ class Disasm:
         for instruction in self.GetIndirectCalls():
             ea = instruction['Address']
             block_parser = idatool.block.Block(ea)
-            print '* Analyzing %s call at %x (%s)' % (block_parser.GetFuncName(), ea, instruction['Disasm'])
+            print('* Analyzing %s call at %x (%s)' % (block_parser.GetFuncName(), ea, instruction['Disasm']))
 
             stack_access_addresses = {}
             for blocks in block_parser.GetBlockPaths():
@@ -1300,9 +1299,9 @@ class Disasm:
                         break
 
             for stack_access_address in stack_access_addresses.keys():
-                print '> %s' % block_parser.GetFuncName()
-                print '  Stack variable at %x (%s)' % (stack_access_address, self.GetDisasmLine(stack_access_address))
-                print '  Used for call at %x (%s)' % (ea, instruction['Disasm'])
+                print('> %s' % block_parser.GetFuncName())
+                print('  Stack variable at %x (%s)' % (stack_access_address, self.GetDisasmLine(stack_access_address)))
+                print('  Used for call at %x (%s)' % (ea, instruction['Disasm']))
                 instructions.append({
                     'Instruction': instruction, 
                     'StackAccessAddress': stack_access_address

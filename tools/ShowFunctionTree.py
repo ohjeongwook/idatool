@@ -21,8 +21,6 @@ class OperationForm_t(PluginForm):
 				continue
 			ea_list += self.EnumerateTree(item, ea, level+1)
 
-		print 'PopulateTree finished'
-
 	def EnumerateTree(self, current_root, parent, level):		
 		address_list = []
 		for ea in idatool.util.Function.DumpFunctionCalls(parent): # TODO: DumpFunctionCalls is missing
@@ -32,7 +30,6 @@ class OperationForm_t(PluginForm):
 
 	def AddItem(self, current_root, ea):
 		name = idaapi.get_true_name(int(ea), int(ea))
-		print '%x: %s' % (ea, name)
 		new_item = QtWidgets.QTreeWidgetItem(current_root)
 		new_item.setText(0, "%s" % name)
 		new_item.setText(1, "%x" % ea)
@@ -42,7 +39,6 @@ class OperationForm_t(PluginForm):
 	def treeClicked(self, treeItem):
 		if treeItem != None:
 			address = int(treeItem.text(1), 16)
-			print 'jumpto: %x' % (address)
 			idaapi.jumpto(address)
 			
 	def OnCreate(self, form):

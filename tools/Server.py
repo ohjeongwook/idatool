@@ -133,7 +133,6 @@ class IDARPCServer(object):
     def LoadWindbgLog(self, filename):
         record_analyzer = RunLogAnalyzer(filename)
         def address_callback(address):
-            print '%x' % address
             idaapi.set_item_color(address, 0x00ff00)
 
         record_analyzer.RunAddressCallback(address_callback)

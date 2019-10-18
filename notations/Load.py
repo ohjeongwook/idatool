@@ -33,6 +33,6 @@ if __name__ == '__main__':
         filename = 'InstructioNotations.db'
 
     if filename:
-        print 'Loading file:', filename
+        print('Loading file: ' + filename)
         disasm.LoadNotations(filename, hash_types = [])
     disasm.Exit()
