@@ -35,7 +35,7 @@ class Block:
         return bytes
 
     def GetInstructionBytes(self, ea):
-        if self.BlockInstructions.has_key(ea):
+        if ea in self.BlockInstructions:
             instructions = self.BlockInstructions[ea]
             instructions.reverse()
             return instructions
@@ -84,11 +84,11 @@ class Block:
             prev_bb_list = self._GetPrevBlocks(bb)
             self.RevMap[bb] = prev_bb_list
             for src in prev_bb_list:
-                if not self.Map.has_key(src):
+                if not src in self.Map:
                     self.Map[src] = []
                 self.Map[src].append(bb)
             for prev_bb in prev_bb_list:                
-                if not bb_map.has_key(prev_bb):
+                if not prev_bb in bb_map:
                     bb_list.append(prev_bb)
                     bb_map[prev_bb] = 1
 
@@ -106,7 +106,7 @@ class Block:
         self.logger.debug(prefix+'%x', block)
         paths = []
         blocks.append(block)
-        if map.has_key(block):
+        if block in map:
             for prev_block in map[block]:
                 if prev_block in blocks:
                     continue
@@ -147,7 +147,7 @@ class Block:
 
             if self.logger.isEnabledFor(logging.DEBUG):
                 for src in self.RevMap[target]:
-                    self.logger.debug('\tsrc: %x (rev key: %d)', src, self.RevMap.has_key(src))
+                    self.logger.debug('\tsrc: %x (rev key: %d)', src, src in self.RevMap)
 
         if len(roots)>1:
             children = {}

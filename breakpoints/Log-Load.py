@@ -17,15 +17,15 @@ if __name__ == '__main__':
     name_and_comments = {}
     windbg_command_parser = windbgtool.log.Parser(filename)
     for log_output in windbg_command_parser.LogOutputLines:
-        if not log_output.has_key('Address'):
+        if not 'Address' in log_output:
             continue
 
         address = log_output['Address']
         
         comment = ''
-        if log_output.has_key('Target Module'):
+        if 'Target Module' in log_output:
             comment += log_output['Target Module']
-        if log_output.has_key('Target Function'):
+        if 'Target Function' in log_output:
             comment += '!' + log_output['Target Function']
 
         if comment == '':

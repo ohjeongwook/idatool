@@ -91,14 +91,14 @@ class Parser:
     def GetNames(self):
         names = []
         for entry in self.Entries:
-            if entry.has_key('Name'):
+            if 'Name' in entry:
                 names.append(entry['Name'])
         return names
     
     def GetBytes(self, name):
         bytes = ''
         for entry in self.Entries:
-            if entry.has_key('Name') and entry['Name'] == name:                
+            if 'Name' in entry and entry['Name'] == name:                
                 for parsed_line in entry['Lines']:
                     print(parsed_line)
                     if parsed_line == None:

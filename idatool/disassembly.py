@@ -168,7 +168,7 @@ class Disasm:
         
             operand_repr = {}
             operand_repr['DataType'] = idatool.operandtypes.DTypeStr[operand.dtyp]
-            if idatool.operandtypes.Values.has_key(operand.type):
+            if operand.type in idatool.operandtypes.Values:
                 operand_repr['Type'] = idatool.operandtypes.Values[operand.type]
             else:
                 operand_repr['Type'] = '%x' % operand.type
@@ -264,11 +264,11 @@ class Disasm:
 
     def MatchInstructionFilter(self, filter, instruction):
         if filter != None:
-            if filter.has_key('Op'):
+            if 'Op' in filter:
                 if not instruction['Op'] in filter['Op']:
                     return False
 
-            if filter.has_key('Target'):
+            if 'Target' in filter:
                 matched = False
                 if filter['Target'] == 'Displacement':
                     for operand in instruction['Operands']:
@@ -513,7 +513,7 @@ class Disasm:
 
                                 self.logger.debug('\t%x', cref)
 
-                                if not checked_eas.has_key(cref):
+                                if not cref in checked_eas:
                                     checked_eas[cref] = 1
                                     start_ea_list.append(cref)
                             if found_non_next_addr:
@@ -608,7 +608,7 @@ class Disasm:
                 if found_jmp:
                     for (cref_type, cref) in instruction['CREFFrom']:
                         if cref_type != 'Call':
-                            if not block_starts.has_key(cref):
+                            if not cref in block_starts:
                                 if self.Debug>1:
                                     self.logger.debug("Found basic block: %.8x" % cref)
 
@@ -629,12 +629,12 @@ class Disasm:
             current_block_instructions = []
             last_block_start = 0
             for instruction in instructions:               
-                if block_starts.has_key(instruction['Address']) and len(current_block_instructions)>0:
+                if instruction['Address'] in block_starts and len(current_block_instructions)>0:
                     block_start = current_block_instructions[0]['Address']
                     block_end = current_block_instructions[-1]['Address']
                     
                     if type == 'Map':
-                        if crefs_map.has_key(block_end):
+                        if block_end in crefs_map:
                             for dst in crefs_map[block_end]:
                                 yield (block_start, block_end, dst)
 
@@ -649,12 +649,12 @@ class Disasm:
                     last_block_start = block_start
 
                 current_block_instructions.append(instruction)
-                if block_ends.has_key(instruction['Address']):
+                if instruction['Address'] in block_ends:
                     block_start = current_block_instructions[0]['Address']
                     block_end = current_block_instructions[-1]['Address']
 
                     if type == 'Map':
-                        if crefs_map.has_key(block_end):
+                        if block_end in crefs_map:
                             for dst in crefs_map[block_end]:
                                 yield (block_start, block_end, dst)
 
@@ -671,7 +671,7 @@ class Disasm:
                 block_start = current_block_instructions[0]['Address']
                 block_end = current_block_instructions[-1]['Address']
                 if type == 'Map':
-                    if crefs_map.has_key(block_end):
+                    if block_end in crefs_map:
                         for dst in crefs_map[block_end]:
                             yield (block_start, block_end, dst)
 
@@ -683,7 +683,7 @@ class Disasm:
                           )
 
     def GetJmpAddress(self, instruction):
-        if not instruction.has_key('CREFFrom'):
+        if not 'CREFFrom' in instruction:
             return 0
 
         for (cref_type, cref) in instruction['CREFFrom']:
@@ -708,12 +708,12 @@ class Disasm:
         src_map = {}
         dst_map = {}
         for (src, src_end, dst) in self._GetFunctionInstructions(ea, type = 'Map'):
-            if not src_map.has_key(src):
+            if not src in src_map:
                 src_map[src] = []
 
             src_map[src].append(dst)
 
-            if not dst_map.has_key(dst):
+            if not dst in dst_map:
                 dst_map[dst] = []
             dst_map[dst].append(src)
             
@@ -792,7 +792,7 @@ class Disasm:
                             back_crefs_map[cref].append(current_block_start)
                             self.logger.debug('\t%x', cref)
 
-                            if not checked_eas.has_key(cref):
+                            if not cref in checked_eas:
                                 checked_eas[cref] = 1
                                 start_ea_list.append([cref, 0])
                                 
@@ -863,7 +863,7 @@ class Disasm:
                 break
             index += 1
 
-        if visited_nodes.has_key(src):
+        if src in visited_nodes:
             return
 
         if index != len(paths):
@@ -873,7 +873,7 @@ class Disasm:
         if self.Debug>0:
             print(self.DumpPaths(paths + [src]))
         
-        if src_map.has_key(src):
+        if src in src_map:
             visited_nodes = copy.deepcopy(visited_nodes)
 
             for dst in src_map[src]:
@@ -886,7 +886,7 @@ class Disasm:
 
         roots = []
         for src in src_map.keys():
-            if not dst_map.has_key(src):
+            if not src in dst_map:
                 if self.Debug>0:
                     print('Root: %.8x' % src)
                 roots.append(src)
@@ -1052,7 +1052,7 @@ class Disasm:
 
                 function_hash = self.GetInstructionsHash(instructions, hash_types)
 
-                if notations.has_key(function_hash):
+                if function_hash in notations:
                     [type, value] = notations[function_hash]
                     address = func.startEA
                 
@@ -1067,7 +1067,7 @@ class Disasm:
     def GenHash2Name(self, entries, hash_type_filter):
         hash_2_name = {}
         for entry in entries:
-            if not entry.has_key('Name') or not entry.has_key('Hash'):
+            if not 'Name' in entry or not 'Hash' in entry:
                 continue
 
             hash_type = entry['Hash']['Type']
@@ -1075,7 +1075,7 @@ class Disasm:
                 continue
 
             hash = entry['Hash']['Value']
-            if not hash_2_name.has_key(hash):
+            if not hash in hash_2_name:
                 hash_2_name[hash] = []
             hash_2_name[hash].append(entry)
             
@@ -1098,7 +1098,7 @@ class Disasm:
 
         function_matches = {}
         for (k, v) in current_hash_2_name.items():
-            if hash_2_name.has_key(k):
+            if k in hash_2_name:
                 current_entry = current_hash_2_name[k]
                 import_entry = hash_2_name[k]
 
@@ -1119,7 +1119,7 @@ class Disasm:
             address = int(address_str, 10)
             function_address = names_and_comments[address_str]['Function']
 
-            if function_matches.has_key(function_address):
+            if function_address in function_matches:
                 current_function_address = function_matches[function_address]
                 current_address = current_function_address+address-function_address
 
@@ -1230,10 +1230,10 @@ class Disasm:
             func_name = idatool.util.Function.GetName(ea)
             function_list.append((level, func_name, ea, call_ea))
             
-            if utility_functions.has_key(ea):
+            if ea in utility_functions:
                 return
 
-            if call_ref_maps.has_key(ea):
+            if ea in call_ref_maps:
                 return
 
             call_ref_maps[ea] = True

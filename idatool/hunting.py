@@ -58,10 +58,10 @@ class Hunter:
 
         block_hash = self.Disasm.GetInstructionsHash(block_instructions)
         
-        if not self.Matches.has_key(block_hash):
+        if not block_hash in self.Matches:
             self.Matches[block_hash] = {}
         
-        if not self.Matches[block_hash].has_key(yara_match_str):
+        if not yara_match_str in self.Matches[block_hash]:
             self.Matches[block_hash][yara_match_str] = []
             
         self.Matches[block_hash][yara_match_str].append(block_instructions)
