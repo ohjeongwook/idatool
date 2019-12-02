@@ -80,7 +80,11 @@ class Form(idaapi.PluginForm):
         pass
         
     def Show(self):
-        return PluginForm.Show(self, self.Title, options = (PluginForm.FORM_CLOSE_LATER | PluginForm.FORM_RESTORE | PluginForm.FORM_SAVE))
+        return idaapi.PluginForm.Show(
+            self, 
+            self.Title,
+            options = (idaapi.PluginForm.FORM_CLOSE_LATER | idaapi.PluginForm.FORM_RESTORE | idaapi.PluginForm.FORM_SAVE)
+        )
 
 if __name__ == '__main__':
     def main(title):
