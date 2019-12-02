@@ -25,7 +25,7 @@ import idatool.util
 class Disasm:
     Debug = 0
     
-    def __init__(self, exit_idc = false):
+    def __init__(self, exit_idc = False):
         self.ExitIDC = exit_idc
         self.logger = logging.getLogger(__name__)
 
