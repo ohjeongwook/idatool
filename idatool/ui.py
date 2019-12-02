@@ -47,13 +47,8 @@ class Form(idaapi.PluginForm):
                                                 )
         return filename
 
-    def AskOpenFileName(self, filter = "Log (*.log)"):
-        filename, _ = PyQt5.QtWidgets.QFileDialog.getOpenFileName(
-                                                    self.parent, 
-                                                    'Open file', 
-                                                    '', 
-                                                    filter
-                                                )
+    def AskOpenFileName(self, filter = "Log (*.log)", dir_name = ''):
+        filename, _ = PyQt5.QtWidgets.QFileDialog.getOpenFileName(self.parent, 'Open file', dir_name, filter)
         return filename
 
     def OnCreate(self, form):
