@@ -1025,20 +1025,20 @@ class Disasm:
         c = conn.cursor()
 
         notations = {}
-        for (rva, hash_type, hash_param, hash, seq, type, value) in c.execute('SELECT RVA, HashType, HashParam, Hash, Sequence, Type, Value FROM Notations'):
+        for (rva, hash_type, hash_param, hash, seq, notation_type, value) in c.execute('SELECT RVA, HashType, HashParam, Hash, Sequence, Type, Value FROM Notations'):
             if rva == None or rva == '':
                 continue
 
             current_address = self.ImageBase+rva
 
             if len(hash_types) > 0:
-                notations[current_address] = [type, value]
+                notations[current_address] = [notation_type, value]
             else:
-                if type == 'Comment':
+                if notation_type == 'Comment':
                     idatool.util.Cmt.Set(current_address, value)
-                elif type == 'Repeatable Comment':
+                elif notation_type == 'Repeatable Comment':
                     idatool.util.Cmt.Set(current_address, value, 1)
-                elif type == 'Name':
+                elif notation_type in ('Name', 'FuncName'):
                     if not idatool.util.Name.IsReserved(value):
                         idatool.util.Name.SetName(current_address, value)            
 
@@ -1053,14 +1053,14 @@ class Disasm:
                 function_hash = self.GetInstructionsHash(instructions, hash_types)
 
                 if function_hash in notations:
-                    [type, value] = notations[function_hash]
+                    [notation_type, value] = notations[function_hash]
                     address = func.startEA
                 
-                    if type == 'Comment':
+                    if notation_type == 'Comment':
                         idatool.util.Cmt.Set(address, value)
-                    if type == 'Repeatable Comment':
+                    elif notation_type == 'Repeatable Comment':
                         idatool.util.Cmt.Set(address, value, 1)
-                    if type == 'Name':
+                    elif notation_type in ('Name', 'FuncName'):
                         if not idatool.util.Name.IsReserved(value):
                             idatool.util.Name.SetName(address, value)
         
