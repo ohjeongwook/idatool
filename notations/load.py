@@ -6,19 +6,18 @@ import idatool.disassembly
 
 if __name__ == '__main__':
     import logging
+    import idaapi
+    import idatool.ui
 
     logging.basicConfig(level = logging.DEBUG)
     logger = logging.getLogger(__name__)
 
     disasm = idatool.disassembly.Disasm()
 
-    import idatool.ui
-
     global form
 
     title = 'Load Notations'
     try:
-        form
         form.OnClose(form)
         form = idatool.ui.Form(title)
     except:
@@ -26,7 +25,7 @@ if __name__ == '__main__':
 
     form.Show()
 
-    filename = form.AskOpenFileName("DB (*.db)")
+    filename = form.AskOpenFileName(filter = "DB (*.db)", dir_name = os.path.dirname(disasm.GetFilename()))
 
     if filename:
         print('Loading file: ' + filename)
