@@ -11,26 +11,22 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
 
     disasm = idatool.disassembly.Disasm()
-    
-    if len(disasm.Args) == 0:
-        import idatool.ui
 
-        global form
+    import idatool.ui
 
-        title = 'Breakpoints-UI'
-        try:
-            form
-            form.OnClose(form)
-            form = idatool.ui.Form(title)
-        except:
-            form = idatool.ui.Form(title)
+    global form
 
-        form.Show()
+    title = 'Load Notations'
+    try:
+        form
+        form.OnClose(form)
+        form = idatool.ui.Form(title)
+    except:
+        form = idatool.ui.Form(title)
 
-        filename = form.AskOpenFileName("DB (*.db)")
+    form.Show()
 
-    if not filename:
-        filename = 'InstructioNotations.db'
+    filename = form.AskOpenFileName("DB (*.db)")
 
     if filename:
         print('Loading file: ' + filename)
