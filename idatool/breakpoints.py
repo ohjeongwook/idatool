@@ -24,7 +24,7 @@ class Util:
 
         if range_str == 'FunctionTree':
             for (func_name, instructions) in self.Disasm.get_function_tree_instructions(filter = filter).items():
-                for line in command_generator.GenerateCommandsForInstructions(instructions, func_name = func_name):
+                for line in command_generator.generate_commands_for_instructions(instructions, func_name = func_name):
                     print(line)
         else:
             instructions = self.Disasm.get_instructions(filter = filter)
@@ -79,7 +79,7 @@ class Util:
                                                 self.Disasm.ImageBase
                                             )
 
-                command_generator.SaveBreakpoints(filename, self.Breakpoints)
+                command_generator.save_breakpoints(filename, self.Breakpoints)
 
     def exit(self):
         self.Disasm.exit()

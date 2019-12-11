@@ -12,7 +12,7 @@ class Util:
     def __init__(self, filename = r''):
         self.Disasm = idatool.disassembly.Disasm()
         self.debugger = windbgtool.debugger.Debugger(dump_file = filename)
-        self.debugger.SetSymbolPath()
+        self.debugger.set_symbol_path()
 
     def find_address_bytes(self, type = ""):
         for addr in self.Disasm.get_addresses(4):
@@ -20,7 +20,7 @@ class Util:
             if bytes != None and len(bytes) == 4:
                 (dword, ) = struct.unpack("<L", bytes)
                 if dword>0:
-                    symbol = self.debugger.ResolveSymbol(dword)
+                    symbol = self.debugger.resolve_symbol(dword)
                     if symbol and symbol.find('+')<0:
                         self.Disasm.redefine(addr, 4, 'data', data_type = 'DWORD')
                         idatool.util.Cmt.set(addr, symbol, 1)
