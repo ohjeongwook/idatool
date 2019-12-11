@@ -6,6 +6,6 @@ import idatool.breakpoints
 
 if __name__ == '__main__':
     breakpoints = idatool.breakpoints.Util()
-    breakpoints.Add("All", "DisplacementCall")
-    breakpoints.Save()
-    breakpoints.Exit()
+    breakpoints.add("All", "DisplacementCall")
+    breakpoints.save()
+    breakpoints.exit()

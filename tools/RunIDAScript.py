@@ -17,14 +17,14 @@ class Runner:
 
         self.RegEx = re.compile(regex, re.IGNORECASE)
 
-    def SetIDAPath(self, filename):
+    def set_ida_path(self, filename):
         self.IDAQ = filename
 
-    def RunScriptOnDir(self, dirname = '.'):
+    def run_script_on_directory(self, dirname = '.'):
         for filename in dircache.listdir(dirname):
             full_path = os.path.join(dirname, filename)
             if os.path.isdir(full_path):
-                self.RunScriptOnDir(full_path)
+                self.run_script_on_directory(full_path)
             else:
                 if self.RegEx.search(filename):
                     cmds = []
@@ -46,4 +46,4 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args(sys.argv)
     
     runner = Runner(args[1:], regex = options.regex)
-    runner.RunScriptOnDir(options.root_folder)
+    runner.run_script_on_directory(options.root_folder)

@@ -6,9 +6,9 @@ import idatool.breakpoints
 
 if __name__ == '__main__':
     breakpoints = idatool.breakpoints.Util()
-    breakpoints.AddFunctions()
-    breakpoints.Add("All", "DisplacementCall")
-    breakpoints.Add("All", "Pointer")
-    breakpoints.Add("All", "IndirectCall")
-    breakpoints.Save()
-    breakpoints.Exit()
+    breakpoints.add_functions()
+    breakpoints.add("All", "DisplacementCall")
+    breakpoints.add("All", "Pointer")
+    breakpoints.add("All", "IndirectCall")
+    breakpoints.save()
+    breakpoints.exit()

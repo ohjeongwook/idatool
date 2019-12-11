@@ -18,16 +18,16 @@ if __name__ == '__main__':
 
     title = 'Load Notations'
     try:
-        form.OnClose(form)
+        form.on_close(form)
         form = idatool.ui.Form(title)
     except:
         form = idatool.ui.Form(title)
 
-    form.Show()
+    form.show()
 
-    filename = form.AskOpenFileName(filter = "DB (*.db)", dir_name = os.path.dirname(disasm.GetFilename()))
+    filename = form.ask_open_filename(filter = "DB (*.db)", dir_name = os.path.dirname(disasm.get_filename()))
 
     if filename:
         print('Loading file: ' + filename)
-        disasm.LoadNotations(filename, hash_types = [])
-    disasm.Exit()
+        disasm.load_notations(filename, hash_types = [])
+    disasm.exit()

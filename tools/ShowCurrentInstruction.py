@@ -11,8 +11,8 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
 
     disasm = idatool.disassembly.Disasm()
-    ea = idatool.util.Area.GetSelectionStart()
-    instruction = disasm.GetInstruction(ea)
+    ea = idatool.util.Area.get_selection_start()
+    instruction = disasm.get_instruction(ea)
     
     pprint.pprint(instruction)
-    disasm.Exit()
+    disasm.exit()

@@ -11,6 +11,6 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
 
     breakpoints = idatool.breakpoints.Util()
-    breakpoints.AddCurrentInstruction()
-    breakpoints.Save()
-    breakpoints.Exit()
+    breakpoints.add_current_instruction()
+    breakpoints.save()
+    breakpoints.exit()

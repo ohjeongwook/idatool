@@ -31,9 +31,9 @@ class Disasm:
 
         self.ImageName = get_root_filename()
         self.ImageBase = get_imagebase()        
-        self.WaitAnalysis()
+        self.wait_analysis()
 
-    def GetNativeSize(self):
+    def get_native_size(self):
         try:
             inf = get_inf_structure()
             if inf.is_32bit():
@@ -45,7 +45,7 @@ class Disasm:
         except Exception as ex:
             raise RuntimeError("Can't determine native OS size: %s" % ex)
 
-    def GetDtypSize(self, dtyp):
+    def get_data_type_size(self, dtyp):
         if dtyp == dt_byte:
             return 1
         elif dtyp == dt_word:
@@ -65,7 +65,7 @@ class Disasm:
         elif dtyp == dt_byte64:
             return 64
 
-    def MakeAddressInfo(self, rva, name):
+    def make_address_info(self, rva, name):
         address_info = {}
         address_info['RVA'] = rva
         address_info['Address'] = self.ImageBase+rva
@@ -76,7 +76,7 @@ class Disasm:
         return address_info
 
 
-    def InInSegment(self, addr):
+    def is_in_segment(self, addr):
         for i in range(0, get_segm_qty(), 1):
             seg = getnseg(i)
             seg_name = get_segm_name(seg)
@@ -84,7 +84,7 @@ class Disasm:
                 return True
         return False
 
-    def Addresses(self, interval = 4):
+    def get_addresses(self, interval = 4):
         for i in range(0, get_segm_qty(), 1):
             seg = getnseg(i)
             addr = seg.startEA
@@ -93,7 +93,7 @@ class Disasm:
                 yield addr
                 addr += interval
 
-    def FindName(self, name):
+    def find_name(self, name):
         for i in range(0, get_segm_qty(), 1):
             seg = getnseg(i)
             ea = seg.startEA
@@ -107,37 +107,37 @@ class Disasm:
         return None
 
     """Utility"""
-    def DumpBytes(self, ea, length):
+    def dump_bytes(self, ea, length):
         return GetManyBytes(ea, length)
 
-    def GetFilename(self):
+    def get_filename(self):
         return get_input_file_path()
         
-    def GetFileBasename(self):
-        return os.path.basename(self.GetFilename())
+    def get_base_filename(self):
+        return os.path.basename(self.get_filename())
         
-    def GetFileHash(self):
+    def get_file_hash(self):
         return GetInputFileMD5()
 
     """ Instruction level function """
-    def GetRegName(self, reg, dtyp = None):
+    def get_register_name(self, reg, dtyp = None):
         if dtyp == None:
-            return get_reg_name(reg, self.GetNativeSize()/8)
+            return get_reg_name(reg, self.get_native_size()/8)
         else:
-            return get_reg_name(reg, self.GetDtypSize(dtyp))
+            return get_reg_name(reg, self.get_data_type_size(dtyp))
 
-    def GetDisasmLine(self, ea):
+    def get_disassemble_line(self, ea):
         return tag_remove(generate_disasm_line(ea, 0))
 
-    def PrintOperandStructure(self, op):
+    def print_operand_structure(self, op):
         print("op.n: %x" % (op.n))
         print("op.type: %x" % (op.type))
         print("op.offb: %x" % (op.offb))
         print("op.flags: %x" % (op.flags))
         print("op.dtyp: %x" % (op.dtyp))
-        print("op.reg: %s (%x)" % (self.GetRegName(op.reg), op.reg))
-        print("op.phrase: %s (%x)" % (self.GetRegName(op.phrase), op.phrase))
-        #print("op.value: %s (%x)" % (self.GetRegName(op.value), op.value))
+        print("op.reg: %s (%x)" % (self.get_register_name(op.reg), op.reg))
+        print("op.phrase: %s (%x)" % (self.get_register_name(op.phrase), op.phrase))
+        #print("op.value: %s (%x)" % (self.get_register_name(op.value), op.value))
         print("op.addr: %x" % (op.addr))
         print("op.specval: %x" % (op.specval))
         print("op.specflag1: %x" % (op.specflag1))
@@ -148,10 +148,10 @@ class Disasm:
         scale = (op.specflag2 & 0xc0) >> 6
         
         if base != 5:
-            print("\tbase: %s (%x)" % (self.GetRegName(base), base))
+            print("\tbase: %s (%x)" % (self.get_register_name(base), base))
             
         if index != 4:
-            print("\tindex: %s (%x)" % (self.GetRegName(index), index))
+            print("\tindex: %s (%x)" % (self.get_register_name(index), index))
 
         print("\tscale: %x" % scale)
         
@@ -159,12 +159,12 @@ class Disasm:
         print("op.specflag4: %x" % (op.specflag4))
         print('')
 
-    def GetOperand(self, operand):
+    def get_operand(self, operand):
         operand_repr = None
 
         if operand.type != o_void:
             if self.Debug>3 and self.logger.isEnabledFor(logging.DEBUG):
-                self.PrintOperandStructure(op)
+                self.print_operand_structure(op)
         
             operand_repr = {}
             operand_repr['DataType'] = idatool.operandtypes.DTypeStr[operand.dtyp]
@@ -182,7 +182,7 @@ class Disasm:
                 operand_repr['Value'] = operand.addr
 
             elif operand.type == o_reg:
-                operand_repr['Value'] = self.GetRegName(operand.reg, operand.dtyp)
+                operand_repr['Value'] = self.get_register_name(operand.reg, operand.dtyp)
 
             elif operand.type == o_imm:
                 operand_repr['Value'] = operand.value
@@ -197,13 +197,13 @@ class Disasm:
                     scale = (operand.specflag2 & 0xc0) >> 6
 
                     if base != 5 or operand.type != o_mem:
-                        base_reg = self.GetRegName(base)
+                        base_reg = self.get_register_name(base)
                         
                     if index != 4:
-                        index_reg = self.GetRegName(index)
+                        index_reg = self.get_register_name(index)
                 else:
                     if operand.phrase != 5 or operand.type != o_mem:
-                        base_reg = self.GetRegName(operand.phrase)
+                        base_reg = self.get_register_name(operand.phrase)
 
                 operand_repr['Base'] = base_reg
                 operand_repr['Scale'] = int(math.pow(2, scale))
@@ -211,14 +211,14 @@ class Disasm:
 
                 if operand.type == o_mem:
                     operand_repr['Address'] = operand.addr
-                    operand_repr['Segment'] = idatool.util.Seg.GetName(operand.addr)
+                    operand_repr['Segment'] = idatool.util.Seg.get_name(operand.addr)
 
                 elif operand.type == o_displ:            
                     operand_repr['Offset'] = operand.addr
 
         return operand_repr
         
-    def GetOperandStr(self, operand):
+    def get_operand_string(self, operand):
         operand_str = ''
         if operand['Type'] == "Void":
             pass
@@ -249,7 +249,7 @@ class Disasm:
             
         return operand_str
 
-    def GetFilter(self, type):
+    def get_filter(self, type):
         if type == "CallToSection":
             filter = {'Op': ['call'], 'Target': 'Section'}
         elif type == "IndirectCall":
@@ -262,7 +262,7 @@ class Disasm:
             filter = {}
         return filter
 
-    def MatchInstructionFilter(self, filter, instruction):
+    def match_instruction_filter(self, filter, instruction):
         if filter != None:
             if 'Op' in filter:
                 if not instruction['Op'] in filter['Op']:
@@ -305,10 +305,10 @@ class Disasm:
                     return False
         return True
 
-    def GetInstructionBytes(self, ea):
+    def get_instruction_bytes(self, ea):
         return GetManyBytes(ea, ItemSize(ea))        
 
-    def GetInstruction(self, current, filter = None):
+    def get_instruction(self, current, filter = None):
         if not isCode(GetFlags(current)):
             return None
 
@@ -317,11 +317,11 @@ class Disasm:
         instruction['RVA'] = current-self.ImageBase
         instruction['Address'] = current
         instruction['Size'] = get_item_size(current)        
-        instruction['Disasm'] = self.GetDisasmLine(current)
+        instruction['Disasm'] = self.get_disassemble_line(current)
         op = GetMnem(current)
         instruction['Op'] = op
-        instruction['DREFFrom'] = idatool.util.Refs.GetDREFFrom(current)
-        instruction['CREFFrom'] = idatool.util.Refs.GetCREFFrom(current)
+        instruction['DREFFrom'] = idatool.util.Refs.get_dref_from(current)
+        instruction['CREFFrom'] = idatool.util.Refs.get_cref_from(current)
         
         feature = cmd.get_canon_feature()
         instruction['IsCall'] = (feature & CF_CALL)
@@ -353,7 +353,7 @@ class Disasm:
             if not operand:
                 break
 
-            operand_repr =self.GetOperand(operand)
+            operand_repr =self.get_operand(operand)
             if operand_repr == None:
                 break
 
@@ -367,7 +367,7 @@ class Disasm:
             instruction['Operands'].append(operand_repr)
         
         name = get_true_name(current)
-        if name != None and name and not idatool.util.Name.IsReserved(name):
+        if name != None and name and not idatool.util.Name.is_reserved(name):
             instruction['Name'] = name
         else:
             instruction['Name'] = ''
@@ -384,12 +384,12 @@ class Disasm:
         else:
             instruction['Repeatable Comment'] = ''
 
-        if self.MatchInstructionFilter(filter, instruction):
+        if self.match_instruction_filter(filter, instruction):
             return instruction
 
         return None
 
-    def GetInstructionText(self, instruction, include_bytes = False, bytes_width = 10):
+    def get_instructionText(self, instruction, include_bytes = False, bytes_width = 10):
         if instruction['Comment']:
             cmt = instruction['Comment']
         else:
@@ -402,7 +402,7 @@ class Disasm:
 
         bytes_str = ''
         if include_bytes:
-            for byte in self.GetInstructionBytes(instruction['Address']):
+            for byte in self.get_instruction_bytes(instruction['Address']):
                 bytes_str += '%.2x ' % ord(byte)
 
         if len(bytes_str) < 3*bytes_width:
@@ -418,38 +418,38 @@ class Disasm:
 
         return line
 
-    def GetInstructionsByRange(self, start = None, end = None, filter = None):
+    def get_instructionsByRange(self, start = None, end = None, filter = None):
         if start == None or end == None:
-            (start, end) = self.GetSelection()
+            (start, end) = self.get_selection()
 
         instructions = []
         current = start
         while current<end:
             if isCode(GetFlags(current)):
-                instruction = self.GetInstruction(current, filter = filter)
+                instruction = self.get_instruction(current, filter = filter)
                 if instruction != None:
                     instructions.append()
             current += get_item_size(current)
         return instructions
 
-    def GetInstructions(self, filter = None):
+    def get_instructions(self, filter = None):
         instructions = []
         for i in range(0, get_segm_qty(), 1):
             seg = getnseg(i)
             current = seg.startEA
             while current<seg.endEA:        
                 if isCode(GetFlags(current)):
-                    instruction = self.GetInstruction(current, filter = filter)
+                    instruction = self.get_instruction(current, filter = filter)
                     if instruction != None:
                         instructions.append(instruction)
                 current += get_item_size(current)
         return instructions
 
-    def GetInstructionsByType(self, range_str = '', type = ""):
-        for instruction in self.GetInstructions(filter = self.GetFilter(type)):
+    def get_instructionsByType(self, range_str = '', type = ""):
+        for instruction in self.get_instructions(filter = self.get_filter(type)):
             print('%.8x\t%s' % (instruction['Address'], instruction['Disasm']))
 
-    def FindREPatterns(self, pattern, search_all = False, ea = None):
+    def find_regular_expression_patterns(self, pattern, search_all = False, ea = None):
         matches = []
         re_pattern = re.compile(pattern, re.IGNORECASE)
 
@@ -458,7 +458,7 @@ class Disasm:
                 seg = getnseg(i)
                 current = seg.startEA
                 while current<seg.endEA:
-                    disasm_line = self.GetDisasmLine(current)
+                    disasm_line = self.get_disassemble_line(current)
                     try:
                         m = re_pattern.match(disasm_line)
                         if m:
@@ -469,7 +469,7 @@ class Disasm:
                     current += get_item_size(current)
         else:
             if ea == None:
-                ea = idatool.util.Function.GetAddress()
+                ea = idatool.util.Function.get_address()
 
             func = get_func(ea)
 
@@ -487,7 +487,7 @@ class Disasm:
                             break
 
                         op = GetMnem(current)
-                        disasm_line = self.GetDisasmLine(current)
+                        disasm_line = self.get_disassemble_line(current)
 
                         try:
                             m = re_pattern.match(disasm_line)
@@ -526,14 +526,14 @@ class Disasm:
         return matches
 
     """ Function level function """
-    def GetFunctions(self):
+    def get_functions(self):
         functions = []
         for i in range(0, get_func_qty(), 1):
             function = getn_func(i)
 
             funcion_ea = function.startEA
             function_name = GetFunctionName(funcion_ea)
-            function_args = self.GetStackArgs(funcion_ea)
+            function_args = self.get_stack_arguments(funcion_ea)
             functions.append(
                 {
                     'Type': "Function", 
@@ -546,7 +546,7 @@ class Disasm:
         
         return functions
 
-    def GetStackArgs(self, ea):
+    def get_stack_arguments(self, ea):
         stack = GetFrame(ea)
         args = []
         return_address_passed = False
@@ -566,9 +566,9 @@ class Disasm:
 
         return args
 
-    def _GetFunctionInstructions(self, ea = None, filter = None, type = 'Instruction'):
+    def __get_function_instructions(self, ea = None, filter = None, type = 'Instruction'):
         if ea == None:
-            ea = idatool.util.Area.GetSelectionStart()
+            ea = idatool.util.Area.get_selection_start()
 
         func = get_func(ea)
         if func:
@@ -584,11 +584,11 @@ class Disasm:
         for block_start in block_start_list:
             current = block_start
             while 1:
-                instruction = self.GetInstruction(current)
+                instruction = self.get_instruction(current)
                 if instruction == None:
                     break
 
-                if self.MatchInstructionFilter(filter, instruction):                        
+                if self.match_instruction_filter(filter, instruction):                        
                     if type == 'Instruction':
                         yield instruction
                     instructions.append(instruction)
@@ -682,7 +682,7 @@ class Disasm:
                             current_block_instructions
                           )
 
-    def GetJmpAddress(self, instruction):
+    def get_jump_address(self, instruction):
         if not 'CREFFrom' in instruction:
             return 0
 
@@ -691,23 +691,23 @@ class Disasm:
                 return cref
         return 0
         
-    def GetFunctionInstructions(self, ea = None, filter = None):
+    def get_function_instructions(self, ea = None, filter = None):
         instructions = []
-        for instruction in self._GetFunctionInstructions(ea, filter = filter):
+        for instruction in self.__get_function_instructions(ea, filter = filter):
             instructions.append(instruction)
         return instructions
         
-    def GetFunctionBlocks(self, ea = None, filter = None):
+    def get_function_blocks(self, ea = None, filter = None):
         blocks = []
-        for (block_start, block_end, instructions) in self._GetFunctionInstructions(ea, filter = filter, type = 'Block'):
+        for (block_start, block_end, instructions) in self.__get_function_instructions(ea, filter = filter, type = 'Block'):
             blocks.append((block_start, block_end, instructions))
         return blocks
 
-    def GetFunctionMap(self, ea = None):
+    def get_function_map(self, ea = None):
         instructions = []
         src_map = {}
         dst_map = {}
-        for (src, src_end, dst) in self._GetFunctionInstructions(ea, type = 'Map'):
+        for (src, src_end, dst) in self.__get_function_instructions(ea, type = 'Map'):
             if not src in src_map:
                 src_map[src] = []
 
@@ -719,18 +719,18 @@ class Disasm:
             
         return (src_map, dst_map)
 
-    def GetBlockInstructions(self, ea = None, filter = None):
-        for (block_start, block_end, instructions) in self._GetFunctionInstructions(ea, filter = filter, type = 'Block'):
+    def get_block_instructions(self, ea = None, filter = None):
+        for (block_start, block_end, instructions) in self.__get_function_instructions(ea, filter = filter, type = 'Block'):
             if block_start <= ea and ea <= block_end:
                 return instructions
         return []
 
-    def GetFunctionCallRefs(self, ea = None, filter = None):
+    def get_function_call_references(self, ea = None, filter = None):
         indirect_reg_call_refs = []
         call_refs = []
         instructions = []
 
-        for instruction in self._GetFunctionInstructions(ea, filter = filter):
+        for instruction in self.__get_function_instructions(ea, filter = filter):
             if instruction['IsIndirectRegCall']:
                 indirect_reg_call_refs.append((instruction['Address'], instruction['Operands']))
 
@@ -738,14 +738,14 @@ class Disasm:
                 if cref_type == 'Call':
                     call_refs.append((instruction['Address'], cref))                   
 
-            if self.MatchInstructionFilter(filter, instruction):
+            if self.match_instruction_filter(filter, instruction):
                 instructions.append(instruction)
 
         return (call_refs, indirect_reg_call_refs, instructions)
 
-    def GetFunctionRefs(self, ea = None):
+    def get_function_references(self, ea = None):
         if ea == None:
-            ea = idatool.util.Area.GetSelectionStart()
+            ea = idatool.util.Area.get_selection_start()
 
         func = get_func(ea)
 
@@ -773,7 +773,7 @@ class Disasm:
                     op = GetMnem(current)
                     
                     if self.logger.isEnabledFor(logging.DEBUG):
-                        disasm_line = self.GetDisasmLine(current)
+                        disasm_line = self.get_disassemble_line(current)
                         self.logger.debug('%x: %s', current, disasm_line)
 
                     if op.startswith('ret'):
@@ -783,7 +783,7 @@ class Disasm:
                     
                     if not (feature & CF_CALL):
                         found_non_next_addr = False
-                        for (cref_type, cref) in idatool.util.Refs.GetCREFFrom(current):
+                        for (cref_type, cref) in idatool.util.Refs.get_cref_from(current):
                             if cref_type == 'Next':
                                 continue
 
@@ -809,10 +809,10 @@ class Disasm:
                 
         return (start_ea_list, crefs_map, back_crefs_map)
 
-    def GetFunctioName(self, ea):
+    def get_function_name(self, ea):
         return get_func_name(ea)
 
-    def GetInstructionsHash(self, instructions, hash_types = ['Op', 'imm_operand']):
+    def get_instructions_hash(self, instructions, hash_types = ['Op', 'imm_operand']):
         op_string = ''
         for instruction in instructions:
             if 'Op' in hash_types:
@@ -827,21 +827,21 @@ class Disasm:
         m.update(op_string)
         return m.hexdigest()
 
-    def GetAllInstructions(self, filter = None):
+    def get_all_instructions(self, filter = None):
         instructions = []
         for i in range(0, get_func_qty(), 1):
             func = getn_func(i)
 
-            for instruction in self.GetFunctionInstructions(func.startEA, filter):
+            for instruction in self.get_function_instructions(func.startEA, filter):
                 instructions.append(instruction)
         return instructions
 
-    def FindImmediateSegmentsRefs(self):
+    def find_immediate_segments_references(self):
         instructions = []
-        for instruction in self.GetAllInstructions(filter = {'Target': 'Immediate'}):
+        for instruction in self.get_all_instructions(filter = {'Target': 'Immediate'}):
             imm_operands = []
             for operand in instruction['Operands']:
-                if operand['Type'] == 'Immediate' and self.InInSegment(operand['Value']):
+                if operand['Type'] == 'Immediate' and self.is_in_segment(operand['Value']):
                     imm_operands.append(operand['Value'])
                     
             if len(imm_operands)>0:
@@ -849,14 +849,14 @@ class Disasm:
 
         return instructions
         
-    def DumpPaths(self, paths):
+    def dump_paths(self, paths):
         path_str = ''
         for path in paths:
             path_str += '%.8x ' % path
 
         return path_str
     
-    def EnumeratePaths(self, src_map, src, visited_nodes = {}, paths = [], loops = {}):
+    def enumerate_paths(self, src_map, src, visited_nodes = {}, paths = [], loops = {}):
         index = 0
         for path in paths:
             if path == src:
@@ -871,18 +871,18 @@ class Disasm:
             return
 
         if self.Debug>0:
-            print(self.DumpPaths(paths + [src]))
+            print(self.dump_paths(paths + [src]))
         
         if src in src_map:
             visited_nodes = copy.deepcopy(visited_nodes)
 
             for dst in src_map[src]:
-                self.EnumeratePaths(src_map, dst, visited_nodes, paths + [src], loops)
+                self.enumerate_paths(src_map, dst, visited_nodes, paths + [src], loops)
                 visited_nodes[dst] = 1
         return loops.values()
 
-    def FindFunctionLoops(self, ea = None):
-        (src_map, dst_map) = self.GetFunctionMap(ea)
+    def find_function_loops(self, ea = None):
+        (src_map, dst_map) = self.get_function_map(ea)
 
         roots = []
         for src in src_map.keys():
@@ -898,14 +898,14 @@ class Disasm:
 
         loops = []
         for root in roots:
-            loops += self.EnumeratePaths(src_map, root, {}, [], {})
+            loops += self.enumerate_paths(src_map, root, {}, [], {})
 
         return loops
 
-    def FindLoops(self):
+    def find_loops(self):
         loops_list = []
-        for function in self.GetFunctions():
-            loops = self.FindFunctionLoops(function['Address'])
+        for function in self.get_functions():
+            loops = self.find_function_loops(function['Address'])
             
             if len(loops)>0:
                 loops_list.append(
@@ -917,12 +917,12 @@ class Disasm:
 
         return loops_list
 
-    def GetNotations(self, hash_types = ['Op', 'imm_operand']):
+    def get_notations(self, hash_types = ['Op', 'imm_operand']):
         function_notes = []
         checked_addresses = {}
 
         if len(hash_types)>0:
-            checked_addresses = self._GetFunctionNotations(hash_types)
+            checked_addresses = self.__get_function_notations(hash_types)
 
         for i in range(0, get_segm_qty(), 1):
             seg = getnseg(i)
@@ -932,15 +932,15 @@ class Disasm:
                     current_address += get_item_size(current_address)
                     continue
 
-                name = idatool.util.Name.GetName(current_address)
-                if name != None and name and not idatool.util.Name.IsReserved(name):
+                name = idatool.util.Name.get_name(current_address)
+                if name != None and name and not idatool.util.Name.is_reserved(name):
                     function_notes.append((current_address-self.ImageBase, '', 0, 'Name', name))
 
-                comment = idatool.util.Cmt.Get(current_address)
+                comment = idatool.util.Cmt.get(current_address)
                 if comment != None:
                     function_notes.append((current_address-self.ImageBase, '', 0, 'Comment', comment))
 
-                repeatable_comment = idatool.util.Cmt.Get(current_address, True)
+                repeatable_comment = idatool.util.Cmt.get(current_address, True)
                 if repeatable_comment != None:
                     function_notes.append((current_address-self.ImageBase, '', 0, 'Repeatable Comment', repeatable_comment))
 
@@ -948,17 +948,17 @@ class Disasm:
 
         return function_notes
 
-    def _GetFunctionNotations(self, hash_types):
+    def __get_function_notations(self, hash_types):
         checked_addresses = {}
         function_notes=[] #TODO: This is not used?
         for i in range(0, get_func_qty(), 1):
             func = getn_func(i)
 
             instructions = []
-            for instruction in self.GetFunctionInstructions(func.startEA):
+            for instruction in self.get_function_instructions(func.startEA):
                 instructions.append(instruction)
 
-            function_hash = self.GetInstructionsHash(instructions, hash_types)
+            function_hash = self.get_instructions_hash(instructions, hash_types)
 
             sequence = 0
             for instruction in instructions:
@@ -976,7 +976,7 @@ class Disasm:
 
         return checked_addresses
 
-    def SaveNotations(self, filename = 'Notations.db', hash_types = []):        
+    def save_notations(self, filename = 'Notations.db', hash_types = []):        
         try:
             conn = sqlite3.connect(filename)
         except:
@@ -999,8 +999,8 @@ class Disasm:
 
         c.execute(create_table_sql)
 
-        for (address, function_hash, sequence, notation_type, value) in self.GetNotations(hash_types = hash_types):
-            if idatool.util.Name.IsReserved(value):
+        for (address, function_hash, sequence, notation_type, value) in self.get_notations(hash_types = hash_types):
+            if idatool.util.Name.is_reserved(value):
                 continue
 
             try:
@@ -1016,7 +1016,7 @@ class Disasm:
         conn.commit()
         conn.close()
         
-    def LoadNotations(self, filename = 'Notations.db', hash_types = []):        
+    def load_notations(self, filename = 'Notations.db', hash_types = []):        
         try:
             conn = sqlite3.connect(filename)
         except:
@@ -1035,36 +1035,36 @@ class Disasm:
                 notations[current_address] = [notation_type, value]
             else:
                 if notation_type == 'Comment':
-                    idatool.util.Cmt.Set(current_address, value)
+                    idatool.util.Cmt.set(current_address, value)
                 elif notation_type == 'Repeatable Comment':
-                    idatool.util.Cmt.Set(current_address, value, 1)
+                    idatool.util.Cmt.set(current_address, value, 1)
                 elif notation_type in ('Name', 'FuncName'):
-                    if not idatool.util.Name.IsReserved(value):
-                        idatool.util.Name.SetName(current_address, value)            
+                    if not idatool.util.Name.is_reserved(value):
+                        idatool.util.Name.set_name(current_address, value)            
 
         if len(hash_types) > 0:
             for i in range(0, get_func_qty(), 1):
                 func = getn_func(i)
 
                 instructions = []
-                for instruction in self.GetFunctionInstructions(func.startEA):
+                for instruction in self.get_function_instructions(func.startEA):
                     instructions.append(instruction)
 
-                function_hash = self.GetInstructionsHash(instructions, hash_types)
+                function_hash = self.get_instructions_hash(instructions, hash_types)
 
                 if function_hash in notations:
                     [notation_type, value] = notations[function_hash]
                     address = func.startEA
                 
                     if notation_type == 'Comment':
-                        idatool.util.Cmt.Set(address, value)
+                        idatool.util.Cmt.set(address, value)
                     elif notation_type == 'Repeatable Comment':
-                        idatool.util.Cmt.Set(address, value, 1)
+                        idatool.util.Cmt.set(address, value, 1)
                     elif notation_type in ('Name', 'FuncName'):
-                        if not idatool.util.Name.IsReserved(value):
-                            idatool.util.Name.SetName(address, value)
+                        if not idatool.util.Name.is_reserved(value):
+                            idatool.util.Name.set_name(address, value)
         
-    def GenHash2Name(self, entries, hash_type_filter):
+    def generate_hash_to_name(self, entries, hash_type_filter):
         hash_2_name = {}
         for entry in entries:
             if not 'Name' in entry or not 'Hash' in entry:
@@ -1087,14 +1087,14 @@ class Disasm:
 
         return hash_2_name
 
-    def LoadFunctionNameByHashes(self, filename):
+    def load_function_name_by_hashes(self, filename):
         fd = open(filename, 'r')
         data = json.loads(fd.read())
         fd.close()
 
         hash_type_filter = ['Op', 'imm_operand']
-        hash_2_name = self.GenHash2Name(data['Function Hashes'], hash_type_filter)
-        current_hash_2_name = self.GenHash2Name(self.GetFunctionHashes(), hash_type_filter)
+        hash_2_name = self.generate_hash_to_name(data['Function Hashes'], hash_type_filter)
+        current_hash_2_name = self.generate_hash_to_name(self.get_function_hashes(), hash_type_filter)
 
         function_matches = {}
         for (k, v) in current_hash_2_name.items():
@@ -1130,7 +1130,7 @@ class Disasm:
 
                     value = names_and_comments[address_str][data_type]
 
-                    if self.IsReserved(value):
+                    if self.is_reserved(value):
                         continue
 
                     self.logger.debug('\t%x: %s %s (orig address = %x/function = %x (diff = %x))', current_address, data_type, value, address, function_address, address-function_address)
@@ -1144,7 +1144,7 @@ class Disasm:
                         set_cmt(current_address, str(value), 1)        
 
     """ Imports """
-    def GetImports(self):
+    def get_imports(self):
         def imp_cb(ea, name, ord):        
             imports.append([ea, name, ord])
             return True
@@ -1159,11 +1159,11 @@ class Disasm:
             imports = []
             enum_import_names(i, imp_cb)
             for [ea, name, ord] in imports:
-                address_infos.append(self.MakeAddressInfo(ea-self.ImageBase, name))
+                address_infos.append(self.make_address_info(ea-self.ImageBase, name))
 
         return address_infos
                
-    def GetIndirectCalls(self, start, end):
+    def get_indirect_calls(self, start, end):
         instructions = []
         for i in range(0, get_segm_qty(), 1):
             seg = getnseg(i)
@@ -1186,48 +1186,48 @@ class Disasm:
 
                         if interesting_call:
                             self.logger.debug('%x %s %s (%s)', current, op, operand_str, idatool.operandtypes.Values[operand.type])
-                            instructions.append(self.GetInstruction(current))
+                            instructions.append(self.get_instruction(current))
 
                 current += get_item_size(current)
 
         return instructions
 
-    def FindUnregonizedFunctions(self):
+    def find_unrecognized_functions(self):
         unrecognized_functions = []
         for seg_ea in Segments():
             for ea in Heads(seg_ea, SegEnd(seg_ea)):
                 if isCode(GetFlags(ea)):
-                    if len(idatool.util.Refs.GetCREFTo(ea)) == 0:
+                    if len(idatool.util.Refs.get_cref_to(ea)) == 0:
                         func = get_func(ea)
                         if func is None or func.startEA != ea:
                             unrecognized_functions.append(ea)
                             
         return unrecognized_functions
 
-    def PatchBytes(self, addr, str):
+    def patch_bytes(self, addr, str):
         for i, c in enumerate(str):
             idc.PatchByte(addr+i, ord(c))
 
-    def FindUtilityFunctions(self, threshold = 10):
+    def find_utility_functions(self, threshold = 10):
         utility_functions = {}
-        for function_info in self.GetFunctions():
+        for function_info in self.get_functions():
             ea = function_info['Address']
-            cref_to = idatool.util.Refs.GetCREFTo(ea)
+            cref_to = idatool.util.Refs.get_cref_to(ea)
 
             if len(cref_to) >= threshold:
                 utility_functions[ea] = True
                 
         return utility_functions
 
-    def GetFunctionTree(self, ea = None, threshold = 10, filter = None):
+    def get_function_tree(self, ea = None, threshold = 10, filter = None):
         call_ref_maps = {}
         function_list = []
         function_instructions = {}
 
-        utility_functions = self.FindUtilityFunctions(threshold)        
+        utility_functions = self.find_utility_functions(threshold)        
 
         def GetCallRefs(call_ea, ea, level = 0):
-            func_name = idatool.util.Function.GetName(ea)
+            func_name = idatool.util.Function.get_name(ea)
             function_list.append((level, func_name, ea, call_ea))
             
             if ea in utility_functions:
@@ -1237,11 +1237,11 @@ class Disasm:
                 return
 
             call_ref_maps[ea] = True
-            (call_refs, indirect_reg_call_refs, instructions) = self.GetFunctionCallRefs(ea, filter)
+            (call_refs, indirect_reg_call_refs, instructions) = self.get_function_call_references(ea, filter)
             function_instructions[func_name] = instructions
             for (caller, operands) in indirect_reg_call_refs:
                 if len(operands)>0:
-                    operand_str = self.GetOperandStr(operands[0])
+                    operand_str = self.get_operand_string(operands[0])
                 else:
                     operand_str = ''
                 function_list.append((level+1, str(operand_str), 0, caller))
@@ -1249,16 +1249,16 @@ class Disasm:
             for (call_address, call_ref) in call_refs:
                 GetCallRefs(call_address, call_ref, level+1)
                 
-        func_addr = idatool.util.Function.GetAddress(ea)
+        func_addr = idatool.util.Function.get_address(ea)
         GetCallRefs(func_addr, func_addr)
         
         return (function_list, function_instructions)
         
-    def GetFunctionTreeInstructions(self, ea = None, filter = None):
-        (function_list, function_instructions) = self.GetFunctionTree(ea = ea, filter = filter)
+    def get_function_tree_instructions(self, ea = None, filter = None):
+        (function_list, function_instructions) = self.get_function_tree(ea = ea, filter = filter)
         return function_instructions
 
-    def Export(self, filename = '', type = 'LIST'):        
+    def export(self, filename = '', type = 'LIST'):        
         if filename == '':
             filename = idc.GetInputFile() + ".lst"
 
@@ -1271,21 +1271,21 @@ class Disasm:
         rfd.close()
         fd.close()
 
-    def WaitAnalysis(self):
+    def wait_analysis(self):
         autoWait()
         
-    def GetStackCalls(self):
+    def get_stack_calls(self):
         instructions = []
-        for instruction in self.GetIndirectCalls():
+        for instruction in self.get_indirect_calls():
             ea = instruction['Address']
             block_parser = idatool.block.Block(ea)
-            print('* Analyzing %s call at %x (%s)' % (block_parser.GetFuncName(), ea, instruction['Disasm']))
+            print('* Analyzing %s call at %x (%s)' % (block_parser.get_function_name(), ea, instruction['Disasm']))
 
             stack_access_addresses = {}
-            for blocks in block_parser.GetBlockPaths():
+            for blocks in block_parser.get_block_paths():
                 parser_list = []
                 for block in blocks:
-                    for (address, bytes) in block_parser.GetInstructionBytes(block):
+                    for (address, bytes) in block_parser.get_instruction_bytes(block):
                         parser = Disasm.Vex.Parser(bytes, address, 'x64')
                         parser_list.append(parser)
 
@@ -1294,13 +1294,13 @@ class Disasm:
                 for dump in tracker.Trace('rip'):
                     if dump['Data']['Type'] == 'Get' and dump['Data']['Value'] == 'rsp':
                         stack_access_addresses[dump['Address']] = 1			
-                        logger.debug('\tBlock list: '+block_parser.DumpBlocks(blocks))
+                        logger.debug('\tBlock list: '+block_parser.dump_blocks(blocks))
                         logger.debug('\t\tFound stack reference at %x', dump['Address'])
                         break
 
             for stack_access_address in stack_access_addresses.keys():
-                print('> %s' % block_parser.GetFuncName())
-                print('  Stack variable at %x (%s)' % (stack_access_address, self.GetDisasmLine(stack_access_address)))
+                print('> %s' % block_parser.get_function_name())
+                print('  Stack variable at %x (%s)' % (stack_access_address, self.get_disassemble_line(stack_access_address)))
                 print('  Used for call at %x (%s)' % (ea, instruction['Disasm']))
                 instructions.append({
                     'Instruction': instruction, 
@@ -1309,7 +1309,7 @@ class Disasm:
                 
         return instructions
 
-    def GetBytes(self, len = 1024):
+    def get_bytes(self, len = 1024):
         for i in range(0, get_segm_qty(), 1):
             seg = getnseg(i)
             addr = seg.startEA
@@ -1324,7 +1324,7 @@ class Disasm:
                         yield (addr, bytes)
                 addr += len
 
-    def Redefine(self, addr, len, type, data_type = 'DWORD'):
+    def redefine(self, addr, len, type, data_type = 'DWORD'):
         MakeUnkn(addr, len)
         
         if type == 'Code':
@@ -1343,17 +1343,17 @@ class Disasm:
 
             MakeData(addr, ff_type, len, 0)
 
-    def MakeFunction(self, addr, len):
-        MakeFunction(addr, addr+len)
+    def make_function(self, addr, len):
+        make_function(addr, addr+len)
 
-    def Exit(self):
+    def exit(self):
         if self.ExitIDC:
-            idc.Exit(0)
+            idc.exit(0)
 
 if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     disasm = Disasm()
 
-    disasm.GetFunctionTreeInstructions(
+    disasm.get_function_tree_instructions(
         filter = {'Op': ['call', 'jmp'], 'Target': 'Indirect'}
     )

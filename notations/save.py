@@ -23,19 +23,19 @@ if __name__ == '__main__':
         title = 'Breakpoints-UI'
         try:
             form
-            form.OnClose(form)
+            form.on_close(form)
             form = idatool.ui.Form(title)
         except:
             form = idatool.ui.Form(title)
 
         form.Show()
 
-        save_filename = form.AskSaveFileName("SQLite (*.db)")
+        save_filename = form.ask_save_filename("SQLite (*.db)")
 
     if not save_filename:
         save_filename = r'InstructioNotations.db'
 
     if save_filename:
         print('Saving file: ' + save_filename)
-        disasm.SaveNotations(save_filename, hash_types = [])
-    disasm.Exit()
+        disasm.save_notations(save_filename, hash_types = [])
+    disasm.exit()

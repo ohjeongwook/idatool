@@ -9,4 +9,4 @@ if __name__ == '__main__':
     logging.basicConfig(level = logging.DEBUG)
     logger = logging.getLogger(__name__)
     disasm = idatool.disassembly.Disasm()
-    disasm.GetInstructionsByType("All", "CallToSection")
+    disasm.get_instructionsByType("All", "CallToSection")

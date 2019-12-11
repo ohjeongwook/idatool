@@ -6,6 +6,6 @@ import idatool.hunting
 
 if __name__ == '__main__':
     hunter = idatool.hunting.Hunter()
-    hunter.FindLoops()
-    hunter.Save()
-    hunter.Close()
+    hunter.find_loops()
+    hunter.save()
+    hunter.close()

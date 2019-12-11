@@ -13,7 +13,7 @@ class YaraScanner:
     def __init__(self, yara_filename):
         self.YaraRules = yara.compile(yara_filename)
 
-    def Scan(self, bytes):
+    def scan(self, bytes):
         yara_match_str = ''
         if self.YaraRules != None:
             yara_matches = self.YaraRules.match(data = block_bytesbytes)

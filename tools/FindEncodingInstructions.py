@@ -6,6 +6,6 @@ import idatool.hunting
 
 if __name__ == '__main__':
     hunter = idatool.hunting.Hunter()
-    hunter.FindEncodingInstructions()
-    hunter.Save()
-    hunter.Close()
+    hunter.find_encoding_instructions()
+    hunter.save()
+    hunter.close()

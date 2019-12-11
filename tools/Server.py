@@ -90,48 +90,48 @@ class IDARPCServer(object):
         self.DisasmTool = Disasm.Tool.Analyzer('x86', 64)
 
     @idaread
-    def GetFunctionInstructions(self, ea = None):
-        return self.Disasm.GetFunctionInstructions(ea)
+    def get_function_instructions(self, ea = None):
+        return self.Disasm.get_function_instructions(ea)
         
     @idaread
-    def GetFunctions(self):
-        return self.Disasm.GetFunctions()
+    def get_functions(self):
+        return self.Disasm.get_functions()
         
     @idaread
-    def GetFunctionHashes(self):
-        return self.Disasm.GetFunctionHashes(hash_types = ['op'])
+    def get_function_hashes(self):
+        return self.Disasm.get_function_hashes(hash_types = ['op'])
         
     @idaread
-    def GetFunctionTree(self, ea = None, threshold = 10):
-        return self.Disasm.GetFunctionTree(ea, threshold)
+    def get_function_tree(self, ea = None, threshold = 10):
+        return self.Disasm.get_function_tree(ea, threshold)
 
     @idaread
-    def GetImports(self):
-		return self.Disasm.GetImports()
-
-    @idawrite
-    def LoadFunctionNameByHashes(self, filename):
-        return self.Disasm.LoadFunctionNameByHashes(filename)
+    def get_imports(self):
+		return self.Disasm.get_imports()
 
     @idawrite
-    def LoadNamesAndComments(self, filename):
-        return self.Disasm.LoadNamesAndComments(filename)
+    def load_function_name_by_hashes(self, filename):
+        return self.Disasm.load_function_name_by_hashes(filename)
+
+    @idawrite
+    def load_names_and_comments(self, filename):
+        return self.Disasm.load_names_and_comments(filename)
         
     @idawrite    
-    def SetCmts(self, cmt_map):
+    def set_comments(self, cmt_map):
         for kv in cmt_map.items():
-            idatool.util.Cmt.Set(kv[0], kv[1])
+            idatool.util.Cmt.set(kv[0], kv[1])
 
     @idaread
-    def GetIndirectCalls(self):
-        return self.Disasm.GetIndirectCalls()
+    def get_indirect_calls(self):
+        return self.Disasm.get_indirect_calls()
 
     @idaread
-    def DisasmBytes(self, bytes, addr):
+    def disassemble_bytes(self, bytes, addr):
         return self.DisasmTool.Disasm(bytes, addr)
 
     @idawrite
-    def LoadWindbgLog(self, filename):
+    def load_windbg_log(self, filename):
         record_analyzer = RunLogAnalyzer(filename)
         def address_callback(address):
             idaapi.set_item_color(address, 0x00ff00)
@@ -139,8 +139,8 @@ class IDARPCServer(object):
         record_analyzer.RunAddressCallback(address_callback)
 
     @idaread
-    def Export(self, lst_filename = ''):
-        return self.DisasmTool.Export(lst_filename)
+    def export(self, lst_filename = ''):
+        return self.DisasmTool.export(lst_filename)
 
 class ThreadWorker(threading.Thread):
     def __init__(self):

@@ -11,6 +11,6 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
 
     disasm = idatool.disassembly.Disasm()
-    for (address, function_hash, sequence, type, value) in disasm.GetNotations():
+    for (address, function_hash, sequence, type, value) in disasm.get_notations():
         print('%.8x: %s+%d %s %s' % (address, function_hash, sequence, type, value))
 

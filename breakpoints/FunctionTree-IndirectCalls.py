@@ -6,6 +6,6 @@ import idatool.breakpoints
 
 if __name__ == '__main__':
     breakpoints = idatool.breakpoints.Util()
-    breakpoints.Add("FunctionTree", "IndirectCall")
-    breakpoints.Save()
-    breakpoints.Exit()
+    breakpoints.add("FunctionTree", "IndirectCall")
+    breakpoints.save()
+    breakpoints.exit()

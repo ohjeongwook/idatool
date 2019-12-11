@@ -23,19 +23,19 @@ if __name__ == '__main__':
         title = 'List-Export-UI'
         try:
             form
-            form.OnClose(form)
+            form.on_close(form)
             form = idatool.ui.Form(title)
         except:
             form = idatool.ui.Form(title)
 
         form.Show()
 
-        save_filename = form.AskSaveFileName("LIST (*.lst)")
+        save_filename = form.ask_save_filename("LIST (*.lst)")
 
     if not save_filename:
-        save_filename = disasm.GetFilename()+r'.lst'
+        save_filename = disasm.get_filename()+r'.lst'
 
     if save_filename:
         print('Save', save_filename)
-        disasm.Export(save_filename)
-    disasm.Exit()
+        disasm.export(save_filename)
+    disasm.exit()

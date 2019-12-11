@@ -9,7 +9,7 @@ class Parser:
         self.Filename = filename
         self.Entries = []
         
-    def Parse(self):
+    def parse(self):
         fd = open(self.Filename, 'r')
         
         name = ''
@@ -35,17 +35,17 @@ class Parser:
                     name = ''
                     addr = ''
                 elif name and line:
-                    parsed_lines.append(self.ParseLine(line))
+                    parsed_lines.append(self.parse_line(line))
 
         fd.close()
 
-    def SkipSpaces(self, line):
+    def skip_spaces(self, line):
         m = re.search('^[ \t]+', line)        
         if m:
             line = line[m.end():]
         return line
 
-    def ParseLine(self, line):
+    def parse_line(self, line):
         parsed_line = {'Line':line}
         # Address
         m = re.search('^[^ \t]+[ \t]+', line)
@@ -68,7 +68,7 @@ class Parser:
             line = line[m.end():]
 
         parsed_line['Bytes'] = insn_bytes
-        line = self.SkipSpaces(line)
+        line = self.skip_spaces(line)
             
         m = re.search('^[^ \t]+', line)
         if m:
@@ -79,7 +79,7 @@ class Parser:
             parsed_line['Op'] = op
             line = line[m.end():]
 
-        line = self.SkipSpaces(line)
+        line = self.skip_spaces(line)
         operands = []
         for operand in re.split(', [ \t]+', line):
             operand = operand.strip()
@@ -88,14 +88,14 @@ class Parser:
         
         return parsed_line
         
-    def GetNames(self):
+    def get_names(self):
         names = []
         for entry in self.Entries:
             if 'Name' in entry:
                 names.append(entry['Name'])
         return names
     
-    def GetBytes(self, name):
+    def get_bytes(self, name):
         bytes = ''
         for entry in self.Entries:
             if 'Name' in entry and entry['Name'] == name:                
@@ -117,4 +117,4 @@ if __name__ == '__main__':
     filename = args[1]
     
     parser = Parser(filename)
-    parser.Parse()
+    parser.parse()
