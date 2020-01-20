@@ -9,9 +9,10 @@ import idatool.util
 import windbgtool.debugger
 
 class Util:
-    def __init__(self, filename = r''):
+    def __init__(self, dump_filename = r''):
         self.Disasm = idatool.disassembly.Disasm()
-        self.debugger = windbgtool.debugger.DbgEngine(dump_file = filename)
+        self.debugger = windbgtool.debugger.DbgEngine()
+        self.debugger.load_dump(dump_filename)
         self.debugger.set_symbol_path()
 
     def find_address_bytes(self, type = ""):
@@ -35,18 +36,17 @@ if __name__ == '__main__':
     logging.basicConfig(level = logging.DEBUG)
     logger = logging.getLogger(__name__)    
    
-    if not os.path.isfile(filename):
-        title = 'ResolveSymbol'
-        try:
-            form.on_close(form)
-            form = idatool.ui.Form(title)
-        except:
-            form = idatool.ui.Form(title)
+    title = 'ResolveSymbol'
+    try:
+        form.on_close(form)
+        form = idatool.ui.Form(title)
+    except:
+        form = idatool.ui.Form(title)
 
-        form.show()
+    form.show()
 
-        filename = form.ask_open_filename("DMP (*.dmp)")
+    dump_filename = form.ask_open_filename("DMP (*.dmp)")
 
-    if filename:
-        util = Util(filename = filename)
+    if dump_filename:
+        util = Util(dump_filename = dump_filename)
         util.find_address_bytes()
