@@ -11,7 +11,7 @@ import windbgtool.debugger
 class Util:
     def __init__(self, filename = r''):
         self.Disasm = idatool.disassembly.Disasm()
-        self.debugger = windbgtool.debugger.Debugger(dump_file = filename)
+        self.debugger = windbgtool.debugger.DbgEngine(dump_file = filename)
         self.debugger.set_symbol_path()
 
     def find_address_bytes(self, type = ""):
