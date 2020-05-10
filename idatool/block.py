@@ -71,7 +71,7 @@ class Block:
         self.logger.debug(prefix+'FindPrevBBs: %x', bb)
         for (cref_type, cref) in idatool.util.Refs.get_cref_to(bb):
             if cref_type != 'Call':
-                prev_bbs.append(self.__get_block_start(prev_ea, prefix+'\t'))
+                prev_bbs.append(self.__get_block_start(cref, prefix+'\t'))
             
         return prev_bbs
 
