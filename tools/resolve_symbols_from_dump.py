@@ -21,7 +21,7 @@ class Util:
             if bytes != None and len(bytes) == 4:
                 (dword, ) = struct.unpack("<L", bytes)
                 if dword>0:
-                    symbol = self.debugger.resolve_symbol(dword)
+                    symbol = self.debugger.find_symbol(dword)
                     if symbol and symbol.find('+')<0:
                         self.Disasm.redefine(addr, 4, 'data', data_type = 'DWORD')
                         idatool.util.Cmt.set(addr, symbol, 1)
